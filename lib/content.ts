@@ -74,6 +74,10 @@ export const hero = {
   primaryCta: { label: "Odaları Keşfet", href: "#odalar" } as CTA,
   secondaryCta: { label: "İletişime Geç", href: "#iletisim" } as CTA,
   scrollHint: "Keşfetmek için kaydırın",
+  // Hero arka plan fotoğrafı eklemek için: image: "/images/hero.jpg"
+  // Boş bırakılırsa şık koyu bir zemin gösterilir.
+  image: "",
+  imageAlt: "İzem Bayan Apart binası",
 };
 
 // --- Hakkımızda ---
