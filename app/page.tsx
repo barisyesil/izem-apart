@@ -5,6 +5,7 @@ import Rooms from "@/components/sections/Rooms";
 import Amenities from "@/components/sections/Amenities";
 import Location from "@/components/sections/Location";
 import Gallery from "@/components/sections/Gallery";
+import Contact from "@/components/sections/Contact";
 
 // =====================================================================
 // ANA SAYFA
@@ -23,6 +24,7 @@ export default function Home() {
       <Amenities />
       <Location />
       <Gallery />
+      <Contact />
     </>
   );
 }

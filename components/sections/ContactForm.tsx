@@ -1,0 +1,148 @@
+"use client";
+
+import { useState } from "react";
+import { WhatsappIcon } from "@/components/ui/brand-icons";
+import { Mail } from "lucide-react";
+import { contact, site } from "@/lib/content";
+
+// =====================================================================
+// İLETİŞİM FORMU (sadece ön yüz — backend YOK)
+// ---------------------------------------------------------------------
+// Form gönderildiğinde sunucuya istek ATMAZ. Bunun yerine girilen
+// bilgilerden bir mesaj metni oluşturup:
+//   • "WhatsApp ile Gönder"  -> wa.me bağlantısını açar (metin hazır)
+//   • "E-posta ile Gönder"   -> mailto: ile e-posta uygulamasını açar
+// Böylece kullanıcı tek tıkla bize ulaşır, hiçbir altyapı gerekmez.
+// =====================================================================
+export default function ContactForm() {
+  const f = contact.form;
+
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [roomType, setRoomType] = useState(f.roomTypeOptions[0]);
+  const [message, setMessage] = useState("");
+
+  // Form alanlarını okunaklı bir mesaja dönüştür.
+  const buildText = () =>
+    [
+      "İzem Bayan Apart — İletişim talebi",
+      `Ad Soyad: ${name}`,
+      `Telefon: ${phone}`,
+      `Oda Tipi: ${roomType}`,
+      message ? `Mesaj: ${message}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+  // WhatsApp'ı hazır metinle aç.
+  const sendWhatsapp = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const url = `${site.whatsappHref}?text=${encodeURIComponent(buildText())}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  // E-posta uygulamasını konu + içerik hazır şekilde aç.
+  const sendEmail = () => {
+    const subject = encodeURIComponent("İzem Bayan Apart — İletişim talebi");
+    const body = encodeURIComponent(buildText());
+    window.location.href = `${site.emailHref}?subject=${subject}&body=${body}`;
+  };
+
+  // Ortak input görünümü (tekrar yazmamak için).
+  const fieldClass =
+    "w-full rounded-lg border border-hairline bg-warmwhite px-4 py-3 text-ink placeholder:text-taupe/60 focus:border-sage focus:outline-none focus:ring-2 focus:ring-sage/25";
+  const labelClass = "mb-1.5 block text-sm font-medium text-ink";
+
+  return (
+    <form
+      onSubmit={sendWhatsapp}
+      className="rounded-2xl border border-hairline bg-cream p-6 sm:p-8"
+    >
+      <div className="space-y-5">
+        <div>
+          <label htmlFor="cf-name" className={labelClass}>
+            {f.nameLabel}
+          </label>
+          <input
+            id="cf-name"
+            type="text"
+            required
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={f.namePlaceholder}
+            className={fieldClass}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="cf-phone" className={labelClass}>
+            {f.phoneLabel}
+          </label>
+          <input
+            id="cf-phone"
+            type="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder={f.phonePlaceholder}
+            className={fieldClass}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="cf-room" className={labelClass}>
+            {f.roomTypeLabel}
+          </label>
+          <select
+            id="cf-room"
+            value={roomType}
+            onChange={(e) => setRoomType(e.target.value)}
+            className={fieldClass}
+          >
+            {f.roomTypeOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="cf-message" className={labelClass}>
+            {f.messageLabel}
+          </label>
+          <textarea
+            id="cf-message"
+            rows={4}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder={f.messagePlaceholder}
+            className={`${fieldClass} resize-y`}
+          />
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <button
+          type="submit"
+          className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-espresso"
+        >
+          <WhatsappIcon className="h-4 w-4" />
+          {f.submitWhatsapp}
+        </button>
+        <button
+          type="button"
+          onClick={sendEmail}
+          className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full border border-hairline px-6 text-sm font-medium text-ink transition-colors hover:border-ink hover:bg-warmwhite"
+        >
+          <Mail className="h-4 w-4" />
+          {f.submitEmail}
+        </button>
+      </div>
+
+      <p className="mt-4 text-xs leading-relaxed text-taupe">{f.note}</p>
+    </form>
+  );
+}
