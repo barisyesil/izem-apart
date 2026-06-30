@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 /* ---------------------------------------------------------------------
    FONTLAR (next/font ile)
@@ -71,7 +73,9 @@ export default function RootLayout({
     // Font değişkenlerini <html>'e veriyoruz ki tüm sayfada kullanılabilsin.
     <html lang="tr" className={`${cormorant.variable} ${inter.variable}`}>
       <body className="flex min-h-dvh flex-col bg-cream text-ink antialiased">
-        {children}
+        <Header />
+        <main className="flex-1">{children}</main>
+        <Footer />
       </body>
     </html>
   );
