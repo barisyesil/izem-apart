@@ -1,26 +1,84 @@
 @import "tailwindcss";
 
+/* =====================================================================
+   İZEM APART — TASARIM TOKEN'LARI
+   ---------------------------------------------------------------------
+   Burada sitenin tüm renk ve font "token"larını tanımlıyoruz.
+   Tailwind v4'te @theme bloğuna yazdığımız --color-* değişkenleri
+   otomatik olarak yardımcı sınıflara dönüşür:
+     --color-cream  ->  bg-cream / text-cream / border-cream ...
+   Renk paleti: sıcak nötr tonlar (krem, kum, antrasit) + organik
+   aksanlar (adaçayı yeşili "sage" ve terracotta). Mavi/mor YOK.
+   ===================================================================== */
+@theme {
+  /* --- Renkler --- */
+  --color-cream: #f6f1e8; /* ana zemin (sayfa arka planı) */
+  --color-warmwhite: #fbf8f2; /* kartlar / yükseltilmiş açık yüzeyler */
+  --color-sand: #eae0d0; /* dönüşümlü bölüm bantları */
+  --color-ink: #262321; /* ana metin (sıcak, siyaha yakın) */
+  --color-espresso: #33302c; /* başlıklar */
+  --color-taupe: #6e665c; /* ikincil metin / açıklama */
+  --color-hairline: #ddd3c4; /* ince çizgiler ve kenarlıklar */
+  --color-sage: #6e7a63; /* birincil aksan (dolgu, hover) */
+  --color-sage-deep: #4f5a43; /* metin olarak adaçayı (AA kontrast) */
+  --color-terracotta: #b16a4c; /* ikincil aksan (vurgular) */
+  --color-terracotta-deep: #9a573b; /* metin/hover olarak terracotta */
+  --color-brass: #a98a5c; /* çok ince detaylar (az kullanılır) */
+
+  /* --- Fontlar (değişkenler layout.tsx'te next/font ile bağlanır) --- */
+  --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+/* =====================================================================
+   TEMEL (BASE) STİLLER
+   ===================================================================== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light; /* site bilinçli olarak açık temalı tasarlandı */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  /* Çapa bağlantılarında (#bolum) yumuşak kaydırma */
+  scroll-behavior: smooth;
+  /* Sabit başlığın altında kalmasın diye çapa hedeflerine üst boşluk */
+  scroll-padding-top: 5rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Marka rengiyle metin seçimi */
+::selection {
+  background-color: var(--color-sage);
+  color: var(--color-cream);
+}
+
+/* Klavye ile gezinenler için net odak halkası (erişilebilirlik) */
+:focus-visible {
+  outline: 2px solid var(--color-sage-deep);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* =====================================================================
+   HAREKETİ AZALT (prefers-reduced-motion)
+   Kullanıcı sisteminde "hareketi azalt" açıksa animasyonları kapatırız.
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
