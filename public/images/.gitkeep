@@ -1,0 +1,2 @@
+# Oda ve apart fotoğraflarını bu klasöre koyun (örn. oda-tek.jpg).
+# Sonra lib/content.ts içinde ilgili "image"/"src" alanını doldurun.
