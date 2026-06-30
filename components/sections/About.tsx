@@ -1,0 +1,48 @@
+import Container from "@/components/ui/Container";
+import Figure from "@/components/ui/Figure";
+import Reveal from "@/components/ui/Reveal";
+import Section from "@/components/ui/Section";
+import SectionHeading from "@/components/ui/SectionHeading";
+import { about } from "@/lib/content";
+
+// =====================================================================
+// HAKKIMIZDA BÖLÜMÜ
+// ---------------------------------------------------------------------
+// Editoryal iki sütun: solda hikâye/metin, sağda görsel.
+// Mobilde alt alta dizilir (önce metin, sonra görsel).
+// =====================================================================
+export default function About() {
+  return (
+    <Section id="hakkimizda" className="bg-cream">
+      <Container>
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          {/* Metin */}
+          <Reveal>
+            <div>
+              <SectionHeading eyebrow={about.eyebrow} title={about.title} />
+              <div className="mt-6 space-y-4 text-base leading-relaxed text-taupe sm:text-lg">
+                {about.paragraphs.map((paragraph) => (
+                  <p key={paragraph.slice(0, 24)}>{paragraph}</p>
+                ))}
+              </div>
+              <p className="mt-8 font-serif text-2xl text-sage-deep">
+                {about.signature}
+              </p>
+            </div>
+          </Reveal>
+
+          {/* Görsel (gerçek foto gelene kadar yer tutucu) */}
+          <Reveal delay={0.1}>
+            <Figure
+              src=""
+              alt="İzem Bayan Apart ortak yaşam alanı"
+              label="Apart'tan bir kare"
+              className="aspect-[4/5] w-full rounded-2xl"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          </Reveal>
+        </div>
+      </Container>
+    </Section>
+  );
+}
