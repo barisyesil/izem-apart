@@ -1,6 +1,8 @@
 import Hero from "@/components/sections/Hero";
 import About from "@/components/sections/About";
 import Trust from "@/components/sections/Trust";
+import Rooms from "@/components/sections/Rooms";
+import Amenities from "@/components/sections/Amenities";
 
 // =====================================================================
 // ANA SAYFA
@@ -15,6 +17,8 @@ export default function Home() {
       <Hero />
       <About />
       <Trust />
+      <Rooms />
+      <Amenities />
     </>
   );
 }
