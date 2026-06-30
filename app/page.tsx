@@ -3,6 +3,8 @@ import About from "@/components/sections/About";
 import Trust from "@/components/sections/Trust";
 import Rooms from "@/components/sections/Rooms";
 import Amenities from "@/components/sections/Amenities";
+import Location from "@/components/sections/Location";
+import Gallery from "@/components/sections/Gallery";
 
 // =====================================================================
 // ANA SAYFA
@@ -19,6 +21,8 @@ export default function Home() {
       <Trust />
       <Rooms />
       <Amenities />
+      <Location />
+      <Gallery />
     </>
   );
 }
