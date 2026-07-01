@@ -41,6 +41,10 @@ export const brand = {
   name: "İzem Bayan Apart",
   shortName: "İzem Apart",
   tagline: "Eskişehir'de kız öğrenci apartı",
+  // Logo BEYAZ (şeffaf zeminli) çizilmiş; bu yüzden Header.tsx içinde
+  // sayfa kaydırılıp zemin açık renge dönünce logoya "brightness-0" filtresi
+  // uygulanır (beyaz -> siyah/koyu). Logoyu değiştirirseniz bu detayı unutmayın.
+  logo: "/images/logo.png",
 };
 
 // --- İletişim bilgileri (tek yerden) ---
@@ -88,14 +92,20 @@ export const hero = {
 };
 
 // --- Hakkımızda ---
+// Metinler orijinal İzem Bayan Apart web sitesindeki "Hakkımızda" yazısına
+// sadık kalınarak (mesafeler, güvenlik, dezenfeksiyon dâhil) hazırlandı.
 export const about = {
   eyebrow: "Hakkımızda",
   title: "Kızlarımız için güvenli ve huzurlu bir yuva",
   paragraphs: [
-    "İzem Bayan Apart; merkezi konumu, konforlu odaları ve keyifli sosyal alanlarıyla Eskişehir'de okuyan kız öğrencilere kurumsal ve kaliteli bir konaklama sunar.",
-    "Deneyimli yönetimimiz ve sıcacık aile ortamımızla, ailelerin gönül rahatlığıyla emanet edebileceği; öğrencilerin ise kendini evinde hissedeceği bir ortam oluşturduk.",
+    "İzem Bayan Apart; merkezi konumu, konforlu odaları, keyifli sosyal olanakları ve sıcacık aile ortamı ile kurumsal ve kaliteli bir hizmet sunmak için çalışır. Farklı şehir ve kültürlerden gelen onlarca kız öğrenciyi bir çatı altında toplayarak huzurla konaklayabilecekleri bir alan yaratıyoruz.",
+    "24 saat görev başındaki fiziki güvenlik personelimiz ve kesintisiz kayıtta olan kamera sistemimiz, konuklarımızı her türlü tehlikeye karşı güvende tutar. Etüt ve dinlenme alanlarımızda hem ders çalışabilir hem de keyifli vakit geçirebilirsiniz.",
+    "Apartımızdan Anadolu Üniversitesi'ne, Espark AVM'ye ve çarşı merkezine 5-10 dakikalık kısa bir yürüyüşle ulaşabilirsiniz. Eskişehir Teknik Üniversitesi ve Osmangazi Üniversitesi'ne giden otobüs, dolmuş ve tramvay duraklarına da çok yakınız.",
+    "Konuklarımızın memnuniyeti için kendimizi sürekli yeniliyoruz; odalarımız yeni sahiplerine teslim edilmeden önce tüm önlemler alınarak dezenfekte ediliyor.",
   ],
   signature: "İzem Bayan Apart",
+  image: "/images/apart-hakkimizda.jpg",
+  imageAlt: "İzem Bayan Apart bina dışından görünüm",
 };
 
 // --- Güven & Konfor (öne çıkanlar) ---
@@ -138,7 +148,7 @@ export const rooms = {
       name: "Tek Kişilik Oda",
       capacity: "1 kişilik",
       description:
-        "Kendinize ait, sakin ve güvenli bir çalışma ve dinlenme alanı. Mahremiyet ve huzur ön planda.",
+        "Tek kişilik odalarımızda konuklarımıza keyifli bir konaklama ayrıcalığı sunuyoruz. Tamamen size özel; kaliteli, konforlu ve güvenli bir oda sizi bekliyor.",
       features: [
         "Tek kişilik kullanım",
         "Odaya özel banyo ve WC",
@@ -147,15 +157,23 @@ export const rooms = {
         "LCD TV",
         "Kaliteli yatak ve baza",
       ],
-      image: "",
+      // Ana küçük resim (kapak fotoğrafı). Tıklanınca aşağıdaki "gallery"
+      // listesindeki TÜM fotoğraflar galeri olarak açılır.
+      image: "/images/tek-kisilik-odalar_1.jpg",
       imageAlt: "İzem Bayan Apart tek kişilik oda",
+      gallery: [
+        { src: "/images/tek-kisilik-odalar_1.jpg", alt: "Tek kişilik oda — görünüm 1" },
+        { src: "/images/tek-kisilik-odalar_2.jpg", alt: "Tek kişilik oda — görünüm 2" },
+        { src: "/images/tek-kisilik-odalar_3.jpg", alt: "Tek kişilik oda — görünüm 3" },
+        { src: "/images/tek-kisilik-odalar_4.jpg", alt: "Tek kişilik oda — görünüm 4" },
+      ] as GalleryImage[],
     },
     {
       id: "cift-kisilik",
       name: "Çift Kişilik Oda",
       capacity: "2 kişilik",
       description:
-        "Arkadaşınızla paylaşabileceğiniz ferah ve aydınlık bir oda. Herkese ait kişisel alanlarla tasarlandı.",
+        "İki kişi konaklayabileceğiniz odalarımız geniş ve ferah yapısıyla kendi alanınızı yaratmanıza imkân tanır. Üst düzeyde güvenlik sağlanan apartımızda aile sıcaklığında, keyifle yaşayabilirsiniz.",
       features: [
         "İki kişilik kullanım",
         "Odaya özel banyo ve WC",
@@ -164,8 +182,15 @@ export const rooms = {
         "LCD TV",
         "Kaliteli yatak ve baza",
       ],
-      image: "",
+      image: "/images/cift-kisilik-odalar_1.jpg",
       imageAlt: "İzem Bayan Apart çift kişilik oda",
+      gallery: [
+        { src: "/images/cift-kisilik-odalar_1.jpg", alt: "Çift kişilik oda — görünüm 1" },
+        { src: "/images/cift-kisilik-odalar_2.jpg", alt: "Çift kişilik oda — görünüm 2" },
+        { src: "/images/cift-kisilik-odalar_3.jpg", alt: "Çift kişilik oda — görünüm 3" },
+        { src: "/images/cift-kisilik-odalar_4.jpg", alt: "Çift kişilik oda — görünüm 4" },
+        { src: "/images/cift-kisilik-odalar_5.jpg", alt: "Çift kişilik oda — görünüm 5" },
+      ] as GalleryImage[],
     },
   ] as Room[],
 };
@@ -174,6 +199,8 @@ export const rooms = {
 export const amenities = {
   eyebrow: "Olanaklar",
   title: "Konforunuz için her detay düşünüldü",
+  intro:
+    "Üniversite hayatınız boyunca en güvenli ve en konforlu alanda konaklamanız için uzun yıllardır aynı kalitede hizmet veriyoruz. Odalarımızdaki tüm eşyalar son derece ergonomiktir.",
   items: [
     { icon: ShowerHead, title: "7/24 Sıcak Su" },
     { icon: NotebookPen, title: "Çalışma Masası ve Sandalye" },
@@ -191,23 +218,32 @@ export const location = {
   eyebrow: "Konum",
   title: "Şehrin tam merkezinde",
   description:
-    "İzem Bayan Apart, Eskişehir Tepebaşı'nda yer alır; üniversitelere, ulaşım hatlarına ve şehir merkezine kolay ulaşım sunar.",
+    "İzem Bayan Apart, Eskişehir Tepebaşı'nda yer alır. Anadolu Üniversitesi, Espark AVM ve çarşı merkezine 5-10 dakikalık yürüme mesafesindeyiz; Eskişehir Teknik Üniversitesi ve Osmangazi Üniversitesi'ne giden otobüs, dolmuş ve tramvay duraklarına da çok yakınız.",
   addressLabel: "Adres",
 };
 
 // --- Galeri ---
+// Buradaki TÜM fotoğraflar en alttaki galeri şeridinde sürekli kayar.
+// Yeni fotoğraf eklemek için: dosyayı public/images/ içine koyup buraya
+// { src: "/images/dosya-adi.jpg", alt: "..." } olarak bir satır ekleyin.
 export const gallery = {
   eyebrow: "Galeri",
   title: "İzem'den kareler",
   intro:
-    "Odalarımızdan ve ortak alanlarımızdan görüntüler. (Gerçek fotoğraflar yakında eklenecek.)",
+    "Odalarımızdan ve ortak alanlarımızdan gerçek kareler. Bir fotoğrafa tıklayarak tüm galeriyi gezebilirsiniz.",
   images: [
-    { src: "", alt: "İzem Bayan Apart bina girişi" },
-    { src: "", alt: "Tek kişilik oda" },
-    { src: "", alt: "Çift kişilik oda" },
-    { src: "", alt: "Ortak çalışma alanı" },
-    { src: "", alt: "Ortak oturma alanı" },
-    { src: "", alt: "Odaya özel banyo" },
+    { src: "/images/bina-girisi-1.jpg", alt: "İzem Bayan Apart bina girişi 1" },
+    { src: "/images/bina-girisi-2.jpg", alt: "İzem Bayan Apart bina girişi 2" },
+    { src: "/images/ortak-alan-1.jpg", alt: "İzem Bayan Apart ortak yaşam alanı" },
+    { src: "/images/tek-kisilik-odalar_1.jpg", alt: "Tek kişilik oda — görünüm 1" },
+    { src: "/images/tek-kisilik-odalar_2.jpg", alt: "Tek kişilik oda — görünüm 2" },
+    { src: "/images/tek-kisilik-odalar_3.jpg", alt: "Tek kişilik oda — görünüm 3" },
+    { src: "/images/tek-kisilik-odalar_4.jpg", alt: "Tek kişilik oda — görünüm 4" },
+    { src: "/images/cift-kisilik-odalar_1.jpg", alt: "Çift kişilik oda — görünüm 1" },
+    { src: "/images/cift-kisilik-odalar_2.jpg", alt: "Çift kişilik oda — görünüm 2" },
+    { src: "/images/cift-kisilik-odalar_3.jpg", alt: "Çift kişilik oda — görünüm 3" },
+    { src: "/images/cift-kisilik-odalar_4.jpg", alt: "Çift kişilik oda — görünüm 4" },
+    { src: "/images/cift-kisilik-odalar_5.jpg", alt: "Çift kişilik oda — görünüm 5" },
   ] as GalleryImage[],
 };
 

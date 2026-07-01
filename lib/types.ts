@@ -24,6 +24,12 @@ export type Feature = {
   description?: string;
 };
 
+// Galeri görseli
+export type GalleryImage = {
+  src: string; // boş "" bırakılırsa yer tutucu görünür
+  alt: string;
+};
+
 // Bir oda tipi
 export type Room = {
   id: string;
@@ -31,14 +37,11 @@ export type Room = {
   capacity: string; // "1 kişilik"
   description: string;
   features: string[];
-  image: string; // public/ içindeki yol; boş "" bırakılırsa yer tutucu görünür
+  image: string; // ana kapak fotoğrafı; boş "" bırakılırsa yer tutucu görünür
   imageAlt: string;
-};
-
-// Galeri görseli
-export type GalleryImage = {
-  src: string; // boş "" bırakılırsa yer tutucu görünür
-  alt: string;
+  // Bu odaya ait TÜM fotoğraflar. Kapak fotoğrafına tıklanınca sadece
+  // bu listedeki fotoğraflar galeri (Lightbox) olarak açılır.
+  gallery: GalleryImage[];
 };
 
 // Sosyal medya bağlantısı
