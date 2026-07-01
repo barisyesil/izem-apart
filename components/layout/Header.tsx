@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { Menu, Phone, X } from "lucide-react";
 import { brand, navLinks, site } from "@/lib/content";
@@ -95,16 +96,23 @@ export default function Header() {
         />
 
         <div className="mx-auto flex h-[var(--header-h)] w-full max-w-6xl items-center justify-between px-5 sm:px-8">
-          {/* Marka adı (logo) */}
+          {/* Marka logosu — logo beyaz çizildiği için krem zeminde
+              "brightness-0" ile koyulaştırılır (beyaz -> siyah). */}
           <a
             href="#anasayfa"
-            className="flex items-baseline gap-2"
+            className="shrink-0"
             aria-label={`${brand.name} ana sayfa`}
           >
-            <span className="font-serif text-2xl leading-none">İzem</span>
-            <span className="text-[10px] uppercase tracking-[0.28em] opacity-80">
-              Bayan Apart
-            </span>
+            <Image
+              src={brand.logo}
+              alt={brand.name}
+              width={345}
+              height={198}
+              priority
+              className={`h-10 w-auto transition-[filter] duration-300 sm:h-12 ${
+                scrolled ? "brightness-0" : ""
+              }`}
+            />
           </a>
 
           {/* Masaüstü menü (md ve üzeri ekranlarda görünür) */}

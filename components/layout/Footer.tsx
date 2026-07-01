@@ -1,6 +1,7 @@
+import Image from "next/image";
 import { Mail, MapPin, Phone } from "lucide-react";
 import Container from "@/components/ui/Container";
-import { footer, navLinks, site, socials } from "@/lib/content";
+import { brand, footer, navLinks, site, socials } from "@/lib/content";
 
 // =====================================================================
 // ALT BİLGİ (FOOTER)
@@ -15,12 +16,15 @@ export default function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Marka + açıklama + sosyal medya */}
           <div className="max-w-sm lg:col-span-2">
-            <div className="flex items-baseline gap-2">
-              <span className="font-serif text-2xl text-espresso">İzem</span>
-              <span className="text-[10px] uppercase tracking-[0.28em] text-taupe">
-                Bayan Apart
-              </span>
-            </div>
+            {/* Footer zemini her zaman açık renk olduğu için logoya
+                sabit olarak "brightness-0" uygulanır (beyaz -> koyu). */}
+            <Image
+              src={brand.logo}
+              alt={brand.name}
+              width={345}
+              height={198}
+              className="h-11 w-auto brightness-0"
+            />
             <p className="mt-4 text-sm leading-relaxed text-taupe">
               {footer.description}
             </p>
