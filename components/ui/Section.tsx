@@ -14,7 +14,7 @@ export default function Section({
   className?: string;
 }) {
   return (
-    <section id={id} className={`scroll-mt-20 py-20 sm:py-28 ${className}`}>
+    <section id={id} className={`py-20 sm:py-28 ${className}`}>
       {children}
     </section>
   );

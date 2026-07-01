@@ -35,13 +35,24 @@
    ===================================================================== */
 :root {
   color-scheme: light; /* site bilinçli olarak açık temalı tasarlandı */
+  /* Sabit başlığın yüksekliği — TEK kaynak. Hem başlığın yüksekliği hem de
+     çapa (#bölüm) bağlantılarının üst boşluğu bu değerden gelir; böylece
+     bölümler her zaman başlığın tam altına oturur. Mobil 4rem, masaüstü 5rem. */
+  --header-h: 4rem;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --header-h: 5rem;
+  }
 }
 
 html {
   /* Çapa bağlantılarında (#bolum) yumuşak kaydırma */
   scroll-behavior: smooth;
-  /* Sabit başlığın altında kalmasın diye çapa hedeflerine üst boşluk */
-  scroll-padding-top: 5rem;
+  /* Çapa hedefleri sabit başlığın ALTINA insin diye üst boşluk.
+     Tek offset kaynağı budur — bölümlerde ayrıca scroll-mt kullanMIYORUZ. */
+  scroll-padding-top: var(--header-h);
 }
 
 body {
