@@ -40,7 +40,7 @@ export default function About() {
                 alt={about.imageAlt}
                 label="Apart'tan bir kare"
                 className="aspect-[4/5] w-full rounded-2xl"
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width: 1024px) 90vw, 45vw"
               />
             </Parallax>
           </Reveal>
