@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, useScroll, useSpring } from "framer-motion";
 import { Menu, Phone, X } from "lucide-react";
 import { brand, navLinks, site } from "@/lib/content";
 import { WhatsappIcon } from "@/components/ui/brand-icons";
@@ -8,13 +9,24 @@ import { WhatsappIcon } from "@/components/ui/brand-icons";
 // =====================================================================
 // ÜST BAŞLIK (HEADER)
 // ---------------------------------------------------------------------
-// İki davranışı olduğu için İstemci Bileşeni ("use client"):
+// İstemci Bileşeni ("use client"). Dört işi var:
 //  1) Sayfa kaydırılınca şeffaf zeminden krem zemine geçer.
 //  2) Mobilde hamburger menü açıp kapatır (sağdan açılan panel).
+//  3) En üstte ince bir "kaydırma ilerleme çubuğu" gösterir.
+//  4) Scroll-spy: ekrandaki bölüme göre aktif menü linkini vurgular.
 // =====================================================================
 export default function Header() {
   const [scrolled, setScrolled] = useState(false); // sayfa kaydırıldı mı?
   const [open, setOpen] = useState(false); // mobil menü açık mı?
+  const [activeId, setActiveId] = useState(""); // ekrandaki aktif bölüm
+
+  // Sayfanın en üstündeki ilerleme çubuğu için kaydırma oranı (0 → 1).
+  const { scrollYProgress } = useScroll();
+  const progressScaleX = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 30,
+    mass: 0.3,
+  });
 
   // Sayfa ~24px kaydırılınca başlığa krem zemin ver.
   useEffect(() => {
@@ -22,6 +34,23 @@ export default function Header() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Scroll-spy: ekranın dikey ortasındaki bölümü "aktif" kabul et.
+  useEffect(() => {
+    const sections = navLinks
+      .map((link) => document.getElementById(link.href.slice(1)))
+      .filter((el): el is HTMLElement => el !== null);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveId(entry.target.id);
+        });
+      },
+      { rootMargin: "-50% 0px -50% 0px" },
+    );
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
   }, []);
 
   // Mobil menü açıkken: arka plan kaymasını kilitle + Esc ile kapat.
@@ -47,7 +76,14 @@ export default function Header() {
           : "bg-transparent text-cream"
       }`}
     >
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:h-20 sm:px-8">
+      {/* Kaydırma ilerleme çubuğu (en üstte ince şerit) */}
+      <motion.div
+        aria-hidden="true"
+        style={{ scaleX: progressScaleX }}
+        className="absolute inset-x-0 top-0 h-0.5 origin-left bg-terracotta"
+      />
+
+      <div className="mx-auto flex h-[var(--header-h)] w-full max-w-6xl items-center justify-between px-5 sm:px-8">
         {/* Marka adı (logo) */}
         <a
           href="#anasayfa"
@@ -62,15 +98,27 @@ export default function Header() {
 
         {/* Masaüstü menü (md ve üzeri ekranlarda görünür) */}
         <nav className="hidden items-center gap-8 md:flex" aria-label="Ana menü">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm tracking-wide opacity-90 transition-opacity hover:opacity-60"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = activeId === link.href.slice(1);
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                aria-current={isActive ? "true" : undefined}
+                className={`relative text-sm tracking-wide transition-opacity ${
+                  isActive ? "opacity-100" : "opacity-75 hover:opacity-100"
+                }`}
+              >
+                {link.label}
+                {/* Aktif linkin altında büyüyen ince çizgi */}
+                <span
+                  className={`absolute -bottom-1.5 left-0 h-px w-full origin-left bg-current transition-transform duration-300 ${
+                    isActive ? "scale-x-100" : "scale-x-0"
+                  }`}
+                />
+              </a>
+            );
+          })}
         </nav>
 
         {/* Sağ taraf: masaüstü WhatsApp butonu + mobil hamburger */}
@@ -126,16 +174,22 @@ export default function Header() {
           </button>
         </div>
         <nav className="flex flex-col px-5" aria-label="Mobil menü">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setOpen(false)}
-              className="border-b border-hairline py-4 font-serif text-2xl text-espresso"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = activeId === link.href.slice(1);
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                aria-current={isActive ? "true" : undefined}
+                className={`border-b border-hairline py-4 font-serif text-2xl ${
+                  isActive ? "text-terracotta-deep" : "text-espresso"
+                }`}
+              >
+                {link.label}
+              </a>
+            );
+          })}
         </nav>
         <div className="mt-auto flex flex-col gap-3 p-5">
           <a
