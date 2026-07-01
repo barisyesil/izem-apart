@@ -69,6 +69,33 @@ body {
   color: var(--color-cream);
 }
 
+/* =====================================================================
+   GALERİ ŞERİDİ (marquee) — sürekli kayan fotoğraf şeridi animasyonu.
+   Şerit JS tarafında iki kez tekrarlanır; bu yüzden %50 kaydırmak tam
+   olarak bir tur atmak anlamına gelir (kusursuz, dikişsiz döngü).
+   Süre, components/sections/Gallery.tsx içinden --marquee-duration
+   CSS değişkeniyle ayarlanır (fotoğraf sayısına göre).
+   ===================================================================== */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+
+/* Üzerine gelince veya klavyeyle içine girince şerit durur (fotoğrafa
+   bakabilmek / tıklayabilmek için). */
+.animate-marquee:hover,
+.animate-marquee:focus-within {
+  animation-play-state: paused;
+}
+
 /* Klavye ile gezinenler için net odak halkası (erişilebilirlik) */
 :focus-visible {
   outline: 2px solid var(--color-sage-deep);
