@@ -28,16 +28,20 @@ export default function Rooms() {
             return (
               <Reveal key={room.id}>
                 <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
-                  {/* Görsel */}
-                  <Figure
-                    src={room.image}
-                    alt={room.imageAlt}
-                    label={room.name}
-                    className={`aspect-[4/3] w-full rounded-2xl ${
+                  {/* Görsel (üzerine gelince hafifçe yakınlaşır) */}
+                  <div
+                    className={`group overflow-hidden rounded-2xl ${
                       imageRight ? "lg:order-last" : ""
                     }`}
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
+                  >
+                    <Figure
+                      src={room.image}
+                      alt={room.imageAlt}
+                      label={room.name}
+                      className="aspect-[4/3] w-full transition-transform duration-500 group-hover:scale-[1.03]"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  </div>
 
                   {/* Metin */}
                   <div>

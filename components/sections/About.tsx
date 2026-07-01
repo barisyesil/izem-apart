@@ -1,5 +1,6 @@
 import Container from "@/components/ui/Container";
 import Figure from "@/components/ui/Figure";
+import Parallax from "@/components/ui/Parallax";
 import Reveal from "@/components/ui/Reveal";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -33,13 +34,15 @@ export default function About() {
 
           {/* Görsel (gerçek foto gelene kadar yer tutucu) */}
           <Reveal delay={0.1}>
-            <Figure
-              src=""
-              alt="İzem Bayan Apart ortak yaşam alanı"
-              label="Apart'tan bir kare"
-              className="aspect-[4/5] w-full rounded-2xl"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
+            <Parallax>
+              <Figure
+                src=""
+                alt="İzem Bayan Apart ortak yaşam alanı"
+                label="Apart'tan bir kare"
+                className="aspect-[4/5] w-full rounded-2xl"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </Parallax>
           </Reveal>
         </div>
       </Container>
