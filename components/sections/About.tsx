@@ -32,12 +32,12 @@ export default function About() {
             </div>
           </Reveal>
 
-          {/* Görsel (gerçek foto gelene kadar yer tutucu) */}
+          {/* Görsel: aparttan gerçek bir kare */}
           <Reveal delay={0.1}>
             <Parallax>
               <Figure
-                src=""
-                alt="İzem Bayan Apart ortak yaşam alanı"
+                src={about.image}
+                alt={about.imageAlt}
                 label="Apart'tan bir kare"
                 className="aspect-[4/5] w-full rounded-2xl"
                 sizes="(max-width: 1024px) 100vw, 50vw"
