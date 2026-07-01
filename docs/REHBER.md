@@ -1,8 +1,8 @@
 # İzem Apart Web Sitesi — Başlangıç Rehberi
 
-Bu rehber, **kod bilmeyen** bir stajyerin bu projeyi anlayıp çalıştırabilmesi,
+Bu rehber, çalıştırabilmesi,
 metinleri/fotoğrafları değiştirebilmesi ve sürecin nasıl işlediğini öğrenmesi
-için yazılmıştır. Acele etmeyin; adım adım gidin. 🙂
+için yazılmıştır. Acele etmeyin; adım adım gidin.
 
 ---
 
@@ -129,20 +129,30 @@ export const site = {
 
 ## 7. Fotoğraf ekleme / değiştirme
 
-Şu an odalar ve galeri için şık **yer tutucular** görünür (gerçek foto gelene
-kadar). Gerçek fotoğraf eklemek için:
+Fotoğraflar `public/images/` klasöründedir (örn. `tek-kisilik-odalar_1.jpg`).
+Boş bırakılan (`src: ""`) alanlar şık bir yer tutucuyla gösterilir. Yeni bir
+fotoğraf eklemek veya değiştirmek için:
 
-1. Fotoğrafı `public/` klasörüne koyun. Düzenli olsun diye `public/images/`
-   klasörü açıp oraya koymanızı öneririz. Örn: `public/images/oda-tek.jpg`.
-2. `lib/content.ts` içinde ilgili `image` (veya galeride `src`) alanını doldurun:
+1. Fotoğrafı `public/images/` klasörüne koyun.
+2. `lib/content.ts` içinde ilgili alanı doldurun:
 
 ```ts
 {
   name: "Tek Kişilik Oda",
-  image: "/images/oda-tek.jpg",   // ← public klasöründen başlayan yol ("/" ile başlar)
+  image: "/images/oda-tek.jpg",   // ← kapak fotoğrafı ("/" ile başlayan yol)
   imageAlt: "İzem Apart tek kişilik oda",  // ← görseli göremeyenler için açıklama
+  gallery: [                       // ← bu odaya tıklayınca açılacak TÜM fotoğraflar
+    { src: "/images/oda-tek.jpg", alt: "Tek kişilik oda — görünüm 1" },
+    { src: "/images/oda-tek-2.jpg", alt: "Tek kişilik oda — görünüm 2" },
+  ],
 }
 ```
+
+> Odaların kapak fotoğrafına tıklandığında SADECE `gallery` listesindeki
+> fotoğraflar açılır. En alttaki "Galeri" bölümü ise `gallery.images`
+> (bkz. `lib/content.ts` içinde `export const gallery`) listesindeki TÜM
+> fotoğrafları sürekli kayan bir şerit olarak gösterir — yeni bir fotoğrafı
+> oraya eklemek için o listeye bir satır eklemeniz yeterli.
 
 > İpucu: Dosya adlarında **Türkçe karakter ve boşluk kullanmayın**
 > (`oda-tek.jpg` iyi, `Oda Tek.jpg` kötü). Fotoğrafları yüklemeden önce
@@ -238,5 +248,5 @@ nasıl yükleneceğine — hosting — sonra birlikte karar verilecek.)
   ya da en yakın `git` yedeğine dönülebilir.
 - Emin değilseniz, değiştirdiğiniz dosyanın bir kopyasını alın, sonra deneyin.
 
-Kolay gelsin! Bu yapıyı anladığınızda, benzer bir siteyi sıfırdan kurmanın
+Bu yapıyı anladığınızda, benzer bir siteyi sıfırdan kurmanın
 mantığını da kavramış olacaksınız.
