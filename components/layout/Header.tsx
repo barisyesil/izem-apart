@@ -14,6 +14,16 @@ import { WhatsappIcon } from "@/components/ui/brand-icons";
 //  2) Mobilde hamburger menü açıp kapatır (sağdan açılan panel).
 //  3) En üstte ince bir "kaydırma ilerleme çubuğu" gösterir.
 //  4) Scroll-spy: ekrandaki bölüme göre aktif menü linkini vurgular.
+//
+// ÖNEMLİ (hata düzeltmesi): Mobil menü (scrim + panel), <header>'ın
+// İÇİNDE değil, DIŞINDA (kardeş öğe olarak) render edilir. Sebebi:
+// CSS'te "backdrop-filter" (Tailwind'de backdrop-blur), üzerine
+// uygulandığı öğeyi "position: fixed" torunları için YENİ bir referans
+// noktası (containing block) yapar. Header kaydırılınca backdrop-blur
+// aldığı için, içindeki "fixed" menü paneli artık tüm ekrana değil,
+// SADECE header'ın küçük kutusuna göre konumlanıyor ve bu da mobil
+// menünün ikinci bölümden sonra (yani header'ın zemini değişince)
+// bozuk görünmesine sebep oluyordu.
 // =====================================================================
 export default function Header() {
   const [scrolled, setScrolled] = useState(false); // sayfa kaydırıldı mı?
@@ -69,83 +79,85 @@ export default function Header() {
   }, [open]);
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled
-          ? "border-b border-hairline bg-cream/95 text-ink backdrop-blur"
-          : "bg-transparent text-cream"
-      }`}
-    >
-      {/* Kaydırma ilerleme çubuğu (en üstte ince şerit) */}
-      <motion.div
-        aria-hidden="true"
-        style={{ scaleX: progressScaleX }}
-        className="absolute inset-x-0 top-0 h-0.5 origin-left bg-terracotta"
-      />
+    <>
+      <header
+        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+          scrolled
+            ? "border-b border-hairline bg-cream/95 text-ink backdrop-blur"
+            : "bg-transparent text-cream"
+        }`}
+      >
+        {/* Kaydırma ilerleme çubuğu (en üstte ince şerit) */}
+        <motion.div
+          aria-hidden="true"
+          style={{ scaleX: progressScaleX }}
+          className="absolute inset-x-0 top-0 h-0.5 origin-left bg-terracotta"
+        />
 
-      <div className="mx-auto flex h-[var(--header-h)] w-full max-w-6xl items-center justify-between px-5 sm:px-8">
-        {/* Marka adı (logo) */}
-        <a
-          href="#anasayfa"
-          className="flex items-baseline gap-2"
-          aria-label={`${brand.name} ana sayfa`}
-        >
-          <span className="font-serif text-2xl leading-none">İzem</span>
-          <span className="text-[10px] uppercase tracking-[0.28em] opacity-80">
-            Bayan Apart
-          </span>
-        </a>
-
-        {/* Masaüstü menü (md ve üzeri ekranlarda görünür) */}
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Ana menü">
-          {navLinks.map((link) => {
-            const isActive = activeId === link.href.slice(1);
-            return (
-              <a
-                key={link.href}
-                href={link.href}
-                aria-current={isActive ? "true" : undefined}
-                className={`relative text-sm tracking-wide transition-opacity ${
-                  isActive ? "opacity-100" : "opacity-75 hover:opacity-100"
-                }`}
-              >
-                {link.label}
-                {/* Aktif linkin altında büyüyen ince çizgi */}
-                <span
-                  className={`absolute -bottom-1.5 left-0 h-px w-full origin-left bg-current transition-transform duration-300 ${
-                    isActive ? "scale-x-100" : "scale-x-0"
-                  }`}
-                />
-              </a>
-            );
-          })}
-        </nav>
-
-        {/* Sağ taraf: masaüstü WhatsApp butonu + mobil hamburger */}
-        <div className="flex items-center gap-1">
+        <div className="mx-auto flex h-[var(--header-h)] w-full max-w-6xl items-center justify-between px-5 sm:px-8">
+          {/* Marka adı (logo) */}
           <a
-            href={site.whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden min-h-[44px] items-center gap-2 rounded-full border border-current px-5 text-sm transition-colors hover:bg-current/10 md:inline-flex"
+            href="#anasayfa"
+            className="flex items-baseline gap-2"
+            aria-label={`${brand.name} ana sayfa`}
           >
-            <WhatsappIcon className="h-4 w-4" />
-            WhatsApp
+            <span className="font-serif text-2xl leading-none">İzem</span>
+            <span className="text-[10px] uppercase tracking-[0.28em] opacity-80">
+              Bayan Apart
+            </span>
           </a>
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full md:hidden"
-            aria-label="Menüyü aç"
-            aria-expanded={open}
-            aria-controls="mobil-menu"
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-        </div>
-      </div>
 
-      {/* --- MOBİL MENÜ --- */}
+          {/* Masaüstü menü (md ve üzeri ekranlarda görünür) */}
+          <nav className="hidden items-center gap-8 md:flex" aria-label="Ana menü">
+            {navLinks.map((link) => {
+              const isActive = activeId === link.href.slice(1);
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "true" : undefined}
+                  className={`relative text-sm tracking-wide transition-opacity ${
+                    isActive ? "opacity-100" : "opacity-75 hover:opacity-100"
+                  }`}
+                >
+                  {link.label}
+                  {/* Aktif linkin altında büyüyen ince çizgi */}
+                  <span
+                    className={`absolute -bottom-1.5 left-0 h-px w-full origin-left bg-current transition-transform duration-300 ${
+                      isActive ? "scale-x-100" : "scale-x-0"
+                    }`}
+                  />
+                </a>
+              );
+            })}
+          </nav>
+
+          {/* Sağ taraf: masaüstü WhatsApp butonu + mobil hamburger */}
+          <div className="flex items-center gap-1">
+            <a
+              href={site.whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden min-h-[44px] items-center gap-2 rounded-full border border-current px-5 text-sm transition-colors hover:bg-current/10 md:inline-flex"
+            >
+              <WhatsappIcon className="h-4 w-4" />
+              WhatsApp
+            </a>
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full md:hidden"
+              aria-label="Menüyü aç"
+              aria-expanded={open}
+              aria-controls="mobil-menu"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* --- MOBİL MENÜ (header'ın DIŞINDA, kardeş öğe) --- */}
       {/* Arka karartma (scrim): tıklayınca menüyü kapatır */}
       <div
         onClick={() => setOpen(false)}
@@ -208,6 +220,6 @@ export default function Header() {
           </a>
         </div>
       </aside>
-    </header>
+    </>
   );
 }
