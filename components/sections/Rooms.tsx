@@ -1,6 +1,10 @@
-import { Check } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Check, Images } from "lucide-react";
 import Container from "@/components/ui/Container";
 import Figure from "@/components/ui/Figure";
+import Lightbox from "@/components/ui/Lightbox";
 import Reveal from "@/components/ui/Reveal";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -10,9 +14,17 @@ import { rooms } from "@/lib/content";
 // ODALARIMIZ BÖLÜMÜ
 // ---------------------------------------------------------------------
 // Her oda tipi, görsel ve metnin dönüşümlü (bir sağ bir sol) dizildiği
-// editoryal bir düzende sunulur. Mobilde alt alta gelir.
+// editoryal bir düzende sunulur. Kapak fotoğrafına tıklayınca SADECE o
+// odanın kendi fotoğrafları (room.gallery) Lightbox'ta açılır.
+// Tıklama gerektirdiği için İstemci Bileşeni ("use client").
 // =====================================================================
 export default function Rooms() {
+  // Hangi odanın galerisi açık ve o galeride hangi fotoğraftayız?
+  const [openRoomId, setOpenRoomId] = useState<string | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const openRoom = rooms.items.find((room) => room.id === openRoomId);
+
   return (
     <Section id="odalar" className="bg-cream">
       <Container>
@@ -28,9 +40,15 @@ export default function Rooms() {
             return (
               <Reveal key={room.id}>
                 <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
-                  {/* Görsel (üzerine gelince hafifçe yakınlaşır) */}
-                  <div
-                    className={`group overflow-hidden rounded-2xl ${
+                  {/* Kapak fotoğrafı — tıklanınca odaya özel galeri açılır */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenRoomId(room.id);
+                      setActiveIndex(0);
+                    }}
+                    aria-label={`${room.name} fotoğraflarını galeride aç (${room.gallery.length} fotoğraf)`}
+                    className={`group relative block overflow-hidden rounded-2xl text-left ${
                       imageRight ? "lg:order-last" : ""
                     }`}
                   >
@@ -41,7 +59,12 @@ export default function Rooms() {
                       className="aspect-[4/3] w-full transition-transform duration-500 group-hover:scale-[1.03]"
                       sizes="(max-width: 1024px) 100vw, 50vw"
                     />
-                  </div>
+                    {/* Göze çok batmayan, tıklanabilir olduğunu belirten rozet */}
+                    <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-ink/55 px-3 py-1.5 text-xs text-cream/90 opacity-80 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
+                      <Images className="h-3.5 w-3.5" aria-hidden="true" />
+                      {room.gallery.length} fotoğraf
+                    </span>
+                  </button>
 
                   {/* Metin */}
                   <div>
@@ -77,6 +100,14 @@ export default function Rooms() {
           })}
         </div>
       </Container>
+
+      {/* Sadece açık olan odanın kendi fotoğrafları gösterilir */}
+      <Lightbox
+        images={openRoom?.gallery ?? []}
+        index={openRoom ? activeIndex : null}
+        onClose={() => setOpenRoomId(null)}
+        onIndexChange={setActiveIndex}
+      />
     </Section>
   );
 }
