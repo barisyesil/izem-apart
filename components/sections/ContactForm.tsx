@@ -56,13 +56,15 @@ export default function ContactForm() {
     confirmBriefly("whatsapp");
   };
 
-  // E-posta uygulamasını konu + içerik hazır şekilde aç.
-  const sendEmail = () => {
-    const subject = encodeURIComponent("İzem Bayan Apart — İletişim talebi");
-    const body = encodeURIComponent(buildText());
-    window.location.href = `${site.emailHref}?subject=${subject}&body=${body}`;
-    confirmBriefly("email");
-  };
+  // E-posta uygulamasını konu + içerik hazır şekilde açacak "mailto:" bağlantısı.
+  // NOT: Bunu "window.location.href = ..." ile DEĞİL, gerçek bir <a href> ile
+  // tetikliyoruz — bazı ortamlarda (kayıtlı e-posta istemcisi olmayan
+  // tarayıcılar dâhil) location.href ataması sayfanın yeniden
+  // değerlendirilmesine yol açıp az önce girilen form bilgilerini
+  // kaybettirebiliyor; gerçek bir mailto: bağlantısı bu riski taşımaz.
+  const subject = encodeURIComponent("İzem Bayan Apart — İletişim talebi");
+  const body = encodeURIComponent(buildText());
+  const mailtoHref = `${site.emailHref}?subject=${subject}&body=${body}`;
 
   // Ortak input görünümü (tekrar yazmamak için).
   const fieldClass =
@@ -152,9 +154,9 @@ export default function ContactForm() {
             confirmLabel={f.confirmWhatsapp}
           />
         </button>
-        <button
-          type="button"
-          onClick={sendEmail}
+        <a
+          href={mailtoHref}
+          onClick={() => confirmBriefly("email")}
           className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-full border border-hairline px-6 text-sm font-medium text-ink transition-colors hover:border-ink hover:bg-warmwhite"
         >
           <SubmitButtonContent
@@ -163,7 +165,7 @@ export default function ContactForm() {
             label={f.submitEmail}
             confirmLabel={f.confirmEmail}
           />
-        </button>
+        </a>
       </div>
 
       <p className="mt-4 text-xs leading-relaxed text-taupe">{f.note}</p>
