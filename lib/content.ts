@@ -203,15 +203,48 @@ export const amenities = {
   title: "Konforunuz için her detay düşünüldü",
   intro:
     "Üniversite hayatınız boyunca en güvenli ve en konforlu alanda konaklamanız için uzun yıllardır aynı kalitede hizmet veriyoruz. Odalarımızdaki tüm eşyalar son derece ergonomiktir.",
+  // "description": karta üzerine gelince (veya dokununca) açılan kısa metin.
   items: [
-    { icon: ShowerHead, title: "7/24 Sıcak Su" },
-    { icon: NotebookPen, title: "Çalışma Masası ve Sandalye" },
-    { icon: Tv, title: "LCD TV" },
-    { icon: BedDouble, title: "Kaliteli Yatak ve Baza" },
-    { icon: Archive, title: "Geniş Eşya Dolabı" },
-    { icon: Bath, title: "Her Odada Banyo ve WC" },
-    { icon: Sofa, title: "Ortak Sosyal Alanlar" },
-    { icon: ShieldCheck, title: "24 Saat Güvenlik" },
+    {
+      icon: ShowerHead,
+      title: "7/24 Sıcak Su",
+      description: "Günün her saati, mevsim fark etmeksizin kesintisiz sıcak su.",
+    },
+    {
+      icon: NotebookPen,
+      title: "Çalışma Masası ve Sandalye",
+      description: "Odanızda size özel, ders çalışmaya hazır ergonomik bir köşe.",
+    },
+    {
+      icon: Tv,
+      title: "LCD TV",
+      description: "Ders arası molalarda keyifli vakit geçirebileceğiniz kişisel ekran.",
+    },
+    {
+      icon: BedDouble,
+      title: "Kaliteli Yatak ve Baza",
+      description: "Dinlendirici bir uyku için özenle seçilmiş yatak ve baza.",
+    },
+    {
+      icon: Archive,
+      title: "Geniş Eşya Dolabı",
+      description: "Tüm eşyalarınızı düzenli tutabileceğiniz ferah bir alan.",
+    },
+    {
+      icon: Bath,
+      title: "Her Odada Banyo ve WC",
+      description: "Paylaşımsız, size özel banyo ve WC ile tam mahremiyet.",
+    },
+    {
+      icon: Sofa,
+      title: "Ortak Sosyal Alanlar",
+      description: "Arkadaşlarınızla vakit geçirebileceğiniz sıcak, samimi alanlar.",
+    },
+    {
+      icon: ShieldCheck,
+      title: "24 Saat Güvenlik",
+      description: "Gün boyu görev başındaki güvenlik personeliyle içiniz rahat.",
+    },
   ] as Feature[],
 };
 
