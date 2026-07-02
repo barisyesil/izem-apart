@@ -12,17 +12,21 @@ import {
 import { ArrowDown } from "lucide-react";
 import ButtonLink from "@/components/ui/ButtonLink";
 import Container from "@/components/ui/Container";
+import MagneticWrap from "@/components/ui/MagneticWrap";
 import { hero } from "@/lib/content";
 
 // =====================================================================
-// KARŞILAMA (HERO) BÖLÜMÜ
+// KARŞILAMA (HERO) BÖLÜMÜ — "Canlı Kapak"
 // ---------------------------------------------------------------------
-// Sayfanın ilk, sinematik ekranı. Koyu ve atmosferik; başlık serif satır
-// satır belirir, altında güven çipleri, sıcak bir parıltı ve ince film
-// dokusu vardır. Kaydırdıkça arka plan hafifçe kayar (parallax).
+// Sayfanın ilk, sinematik ekranı. Bilinçli olarak TAMAMEN soyut/grafik:
+// gerçek fotoğraf yerine kendi çizdiğimiz ince bir "bina" çizgi-motifi
+// (HeroMotif) kullanılır — apartın gerçek fotoğrafları (telefonla
+// çekilmiş) bu kadar büyük kullanım için yeterince "premium" değil.
+// Başlık satır satır bir "perde açılma" (wipe) efektiyle belirir, altında
+// güven çipleri, sıcak bir parıltı, ince bir yaprak (taç yaprağı) katmanı
+// ve mıknatıs gibi imleci takip eden butonlar vardır.
 // "use client": animasyon ve kaydırma tarayıcıda çalışır.
-// "Hareketi azalt" açıksa tüm animasyonlar kapanır, içerik sabit kalır.
-// Fotoğraf eklemek için lib/content.ts içindeki hero.image alanını doldurun.
+// "Hareketi azalt" açıksa: tüm animasyonlar kapanır, içerik sabit kalır.
 // =====================================================================
 
 // Öğelerin yumuşakça yükselerek belirmesi. custom = gecikme (saniye).
@@ -34,6 +38,29 @@ const rise: Variants = {
     transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] },
   }),
 };
+
+// Başlık satırları için "perde açılma" (wipe) efekti: satır, görünmez bir
+// çerçevenin (overflow-hidden) altından yukarı doğru kayarak ortaya çıkar —
+// sade bir soluklaşmadan çok daha sinematik bir "ortaya çıkış" hissi verir.
+const wipe: Variants = {
+  hidden: { y: "115%" },
+  show: (delay = 0) => ({
+    y: "0%",
+    transition: { duration: 0.85, delay, ease: [0.16, 1, 0.3, 1] },
+  }),
+};
+
+// Taç yaprağı konumları sabittir (Math.random() DEĞİL) — sunucu ve
+// tarayıcı ilk render'da aynı sonucu üretmeli (hydration uyumsuzluğu
+// olmasın diye). Her biri farklı gecikme/süre ile düşer.
+const PETALS = [
+  { left: "8%", delay: "0s", duration: "13s", size: 7 },
+  { left: "22%", delay: "3s", duration: "16s", size: 5 },
+  { left: "48%", delay: "6s", duration: "14s", size: 6 },
+  { left: "67%", delay: "1.5s", duration: "17s", size: 8 },
+  { left: "83%", delay: "4.5s", duration: "12s", size: 5 },
+  { left: "92%", delay: "8s", duration: "15s", size: 6 },
+];
 
 export default function Hero() {
   const reduce = useReducedMotion();
@@ -71,11 +98,29 @@ export default function Hero() {
             className="scale-110 object-cover"
           />
         ) : (
-          <span className="pointer-events-none absolute -right-[6%] bottom-[-12%] select-none font-serif text-[42vw] leading-none text-cream/[0.045] sm:text-[30vw]">
-            İzem
-          </span>
+          <HeroMotif reduce={!!reduce} />
         )}
       </motion.div>
+
+      {/* İnce, süzülerek düşen taç yaprakları (yalnızca dekoratif) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+      >
+        {PETALS.map((petal) => (
+          <span
+            key={petal.left}
+            className="animate-petal-fall absolute -top-[10%] rounded-[60%_0_60%_0] bg-terracotta/30"
+            style={{
+              left: petal.left,
+              width: petal.size,
+              height: petal.size,
+              animationDelay: petal.delay,
+              animationDuration: petal.duration,
+            }}
+          />
+        ))}
+      </div>
 
       {/* Sıcak, yavaşça "nefes alan" terracotta parıltısı */}
       <motion.div
@@ -122,26 +167,27 @@ export default function Hero() {
               {hero.eyebrow}
             </motion.p>
 
-            {/* Başlık — satır satır belirir */}
+            {/* Başlık — satır satır "perde açılma" ile belirir */}
             <h1 className="font-serif text-[2.75rem] leading-[1.05] sm:text-6xl md:text-7xl">
               {hero.titleLines.map((line, index) => (
-                <motion.span
-                  key={line}
-                  className="block"
-                  variants={rise}
-                  custom={0.2 + index * 0.12}
-                  initial={reduce ? false : "hidden"}
-                  animate={reduce ? false : "show"}
-                >
-                  {line}
-                </motion.span>
+                <span key={line} className="block overflow-hidden">
+                  <motion.span
+                    className="block"
+                    variants={wipe}
+                    custom={0.2 + index * 0.15}
+                    initial={reduce ? false : "hidden"}
+                    animate={reduce ? false : "show"}
+                  >
+                    {line}
+                  </motion.span>
+                </span>
               ))}
             </h1>
 
             {/* Alt metin */}
             <motion.p
               variants={rise}
-              custom={0.5}
+              custom={0.55}
               initial={reduce ? false : "hidden"}
               animate={reduce ? false : "show"}
               className="mt-6 max-w-xl text-base leading-relaxed text-cream/80 sm:text-lg"
@@ -149,30 +195,34 @@ export default function Hero() {
               {hero.subtitle}
             </motion.p>
 
-            {/* Çağrı butonları */}
+            {/* Çağrı butonları — masaüstünde imleci hafifçe takip eder */}
             <motion.div
               variants={rise}
-              custom={0.62}
+              custom={0.68}
               initial={reduce ? false : "hidden"}
               animate={reduce ? false : "show"}
               className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
             >
-              <ButtonLink href={hero.primaryCta.href} variant="light" className="group">
-                {hero.primaryCta.label}
-                <ArrowDown
-                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5"
-                  aria-hidden="true"
-                />
-              </ButtonLink>
-              <ButtonLink href={hero.secondaryCta.href} variant="outline-light">
-                {hero.secondaryCta.label}
-              </ButtonLink>
+              <MagneticWrap>
+                <ButtonLink href={hero.primaryCta.href} variant="light" className="group">
+                  {hero.primaryCta.label}
+                  <ArrowDown
+                    className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5"
+                    aria-hidden="true"
+                  />
+                </ButtonLink>
+              </MagneticWrap>
+              <MagneticWrap>
+                <ButtonLink href={hero.secondaryCta.href} variant="outline-light">
+                  {hero.secondaryCta.label}
+                </ButtonLink>
+              </MagneticWrap>
             </motion.div>
 
             {/* Güven çipleri */}
             <motion.ul
               variants={rise}
-              custom={0.74}
+              custom={0.8}
               initial={reduce ? false : "hidden"}
               animate={reduce ? false : "show"}
               className="mt-10 flex flex-wrap gap-x-6 gap-y-3"
@@ -216,5 +266,74 @@ export default function Hero() {
         </span>
       </a>
     </section>
+  );
+}
+
+// =====================================================================
+// HERO ÇİZGİ-MOTİFİ (HeroMotif)
+// ---------------------------------------------------------------------
+// Fotoğraf yerine kullanılan, kendi çizdiğimiz soyut "bina" motifi: dış
+// hat + pencere ızgarası + bir kapı. Sayfa açıldığında ince bir çizgi
+// gibi "kendini çizer" (pathLength 0 → 1), gerçek apartın pencere
+// ritmine gevşek şekilde gönderme yapar. Tamamen dekoratif (aria-hidden).
+// =====================================================================
+function HeroMotif({ reduce }: { reduce: boolean }) {
+  // 3 sütun x 4 satırlık pencere ızgarası için koordinatlar.
+  const windowCols = [44, 92, 140];
+  const windowRows = [44, 98, 152, 206];
+
+  return (
+    <div className="absolute -right-[8%] bottom-[-8%] w-[78vw] max-w-[420px] text-brass opacity-[0.16] sm:max-w-[480px]">
+      <svg viewBox="0 0 240 320" fill="none" className="h-auto w-full">
+        {/* Bina dış hattı */}
+        <motion.rect
+          x="20"
+          y="16"
+          width="200"
+          height="288"
+          rx="6"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          initial={reduce ? false : { pathLength: 0 }}
+          animate={reduce ? undefined : { pathLength: 1 }}
+          transition={{ duration: 1.8, ease: "easeInOut" }}
+        />
+        {/* Pencereler */}
+        {windowRows.map((y, rowIndex) =>
+          windowCols.map((x, colIndex) => (
+            <motion.rect
+              key={`${x}-${y}`}
+              x={x}
+              y={y}
+              width="32"
+              height="36"
+              rx="2"
+              stroke="currentColor"
+              strokeWidth="1"
+              initial={reduce ? false : { pathLength: 0, opacity: 0 }}
+              animate={reduce ? undefined : { pathLength: 1, opacity: 1 }}
+              transition={{
+                duration: 0.6,
+                delay: 0.6 + (rowIndex * 3 + colIndex) * 0.05,
+                ease: "easeOut",
+              }}
+            />
+          )),
+        )}
+        {/* Kapı */}
+        <motion.rect
+          x="104"
+          y="254"
+          width="32"
+          height="50"
+          rx="2"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          initial={reduce ? false : { pathLength: 0 }}
+          animate={reduce ? undefined : { pathLength: 1 }}
+          transition={{ duration: 0.7, delay: 1.5, ease: "easeOut" }}
+        />
+      </svg>
+    </div>
   );
 }
