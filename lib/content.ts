@@ -314,6 +314,9 @@ export const contact = {
     messagePlaceholder: "İletmek istedikleriniz...",
     submitWhatsapp: "WhatsApp ile Gönder",
     submitEmail: "E-posta ile Gönder",
+    // Butona basılınca kısa süreliğine görünen onay metinleri.
+    confirmWhatsapp: "WhatsApp açılıyor",
+    confirmEmail: "E-posta açılıyor",
     note: "Form göndermek için bir hesap oluşturmanıza gerek yok; mesajınız doğrudan WhatsApp veya e-posta uygulamanızda açılır.",
   },
 };
