@@ -2,13 +2,26 @@
 
 import { useState } from "react";
 import { Check, Images } from "lucide-react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import Container from "@/components/ui/Container";
 import Figure from "@/components/ui/Figure";
 import Lightbox from "@/components/ui/Lightbox";
 import Reveal from "@/components/ui/Reveal";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { rooms } from "@/lib/content";
+import { chapters, rooms } from "@/lib/content";
+
+// Özellik listesi için "sırayla sıraya girme" (stagger) varyantları.
+// Liste (<ul>) ekrana girince çocuklarına (<li>) bunu haber verir; her
+// biri kendi payına düşen küçük gecikmeyle belirir.
+const featureList: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07 } },
+};
+const featureItem: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+};
 
 // =====================================================================
 // ODALARIMIZ BÖLÜMÜ
@@ -19,6 +32,7 @@ import { rooms } from "@/lib/content";
 // Tıklama gerektirdiği için İstemci Bileşeni ("use client").
 // =====================================================================
 export default function Rooms() {
+  const reduceMotion = useReducedMotion();
   // Hangi odanın galerisi açık ve o galeride hangi fotoğraftayız?
   const [openRoomId, setOpenRoomId] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -28,7 +42,11 @@ export default function Rooms() {
   return (
     <Section id="odalar" className="bg-cream">
       <Container>
-        <SectionHeading eyebrow={rooms.eyebrow} title={rooms.title} />
+        <SectionHeading
+          eyebrow={rooms.eyebrow}
+          number={chapters.find((c) => c.id === "odalar")?.number}
+          title={rooms.title}
+        />
         <p className="mt-4 max-w-xl text-base leading-relaxed text-taupe sm:text-lg">
           {rooms.intro}
         </p>
@@ -79,10 +97,19 @@ export default function Rooms() {
                     <p className="mt-4 text-base leading-relaxed text-taupe">
                       {room.description}
                     </p>
-                    <ul className="mt-6 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+                    {/* Özellikler tek tek, hafif bir gecikmeyle "sıraya girer" —
+                        liste doldukça oda size daha somut anlatılıyormuş hissi verir. */}
+                    <motion.ul
+                      className="mt-6 grid gap-x-6 gap-y-3 sm:grid-cols-2"
+                      variants={reduceMotion ? undefined : featureList}
+                      initial={reduceMotion ? undefined : "hidden"}
+                      whileInView={reduceMotion ? undefined : "show"}
+                      viewport={{ once: true, margin: "-80px" }}
+                    >
                       {room.features.map((feature) => (
-                        <li
+                        <motion.li
                           key={feature}
+                          variants={reduceMotion ? undefined : featureItem}
                           className="flex items-center gap-2.5 text-sm text-ink"
                         >
                           <Check
@@ -90,9 +117,9 @@ export default function Rooms() {
                             aria-hidden="true"
                           />
                           {feature}
-                        </li>
+                        </motion.li>
                       ))}
-                    </ul>
+                    </motion.ul>
                   </div>
                 </div>
               </Reveal>

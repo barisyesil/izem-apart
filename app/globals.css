@@ -96,6 +96,72 @@ body {
   animation-play-state: paused;
 }
 
+/* =====================================================================
+   TAÇ YAPRAĞI DÜŞÜŞÜ (petal-fall) — Hero'da süzülerek düşen ince
+   dekoratif yapraklar. "Hareketi azalt" açıkken global kural bunu
+   otomatik olarak tek bir anlık kareye indirip durdurur (aşağıda ayrı
+   bir kod yazmaya gerek kalmaz).
+   ===================================================================== */
+@keyframes petal-fall {
+  0% {
+    transform: translate(0, -10%) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  25% {
+    transform: translate(10px, 25%) rotate(45deg);
+  }
+  50% {
+    transform: translate(-8px, 55%) rotate(90deg);
+  }
+  75% {
+    transform: translate(6px, 85%) rotate(135deg);
+  }
+  100% {
+    transform: translate(0, 115%) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+.animate-petal-fall {
+  animation-name: petal-fall;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* =====================================================================
+   IŞIK HÜZMELERİ (beam-drift) — Hero arka planında yavaşça kayan, marka
+   renkleriyle (terracotta/brass/adaçayı) boyanmış ince ışık huzmeleri.
+   Saf CSS: "Hareketi azalt" açıkken yukarıdaki genel kural otomatik
+   olarak durdurur (petal-fall / marquee ile aynı desen).
+   ===================================================================== */
+@keyframes beam-drift {
+  from {
+    background-position: 50% 30%;
+  }
+  to {
+    background-position: 350% 30%;
+  }
+}
+
+@keyframes beam-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-beam-drift {
+  animation:
+    beam-drift 55s linear infinite,
+    beam-pulse 9s ease-in-out infinite;
+}
+
 /* Klavye ile gezinenler için net odak halkası (erişilebilirlik) */
 :focus-visible {
   outline: 2px solid var(--color-sage-deep);

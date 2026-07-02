@@ -70,6 +70,21 @@ export const navLinks: NavLink[] = [
   { label: "İletişim", href: "#iletisim" },
 ];
 
+// --- Bölümler (sayfa "hikayesinin" bölüm/numaraları) ---
+// Hem her bölümün başlığındaki küçük numaraya ("02" gibi) hem de sağdaki
+// "Büyüyen İplik" rayına (ChapterRail) TEK kaynaktan besleme yapar; böylece
+// iki yerde ayrı ayrı yazılan numaralar birbirinden kopmaz. Hero "kapak"
+// sayıldığı için listede yoktur; Konum ise üst menüde yer almasa da (menü
+// kısa tutulmak istendi) burada, sayfanın gerçek akışında bir bölümdür.
+export const chapters: { id: string; number: string; label: string }[] = [
+  { id: "hakkimizda", number: "02", label: "Hakkımızda" },
+  { id: "odalar", number: "03", label: "Odalar" },
+  { id: "olanaklar", number: "04", label: "Olanaklar" },
+  { id: "konum", number: "05", label: "Konum" },
+  { id: "galeri", number: "06", label: "Galeri" },
+  { id: "iletisim", number: "07", label: "İletişim" },
+];
+
 // --- Karşılama (Hero) ---
 export const hero = {
   eyebrow: "Eskişehir · Kız Öğrenci Apartı",
@@ -96,7 +111,11 @@ export const hero = {
 // sadık kalınarak (mesafeler, güvenlik, dezenfeksiyon dâhil) hazırlandı.
 export const about = {
   eyebrow: "Hakkımızda",
-  title: "Kızlarımız için güvenli ve huzurlu bir yuva",
+  // Başlıktaki tek kelime CyclingWord ile döner (bkz. components/sections/About.tsx).
+  // Buradaki kelimeler sayfada zaten anlatılan gerçeklerdir, yeni bir iddia değildir.
+  titlePrefix: "Kızlarımız için",
+  titleSuffix: "bir yuva",
+  cyclingWords: ["güvenli", "huzurlu", "hijyenik", "konforlu ", "merkezi"],
   paragraphs: [
     "İzem Bayan Apart; merkezi konumu, konforlu odaları ve sıcak aile ortamıyla öğrencilere huzurla konaklayabilecekleri bir yaşam alanı sunar. 7/24 görev yapan güvenlik personelimiz ve kesintisiz kamera sistemimiz sayesinde güvenliğiniz her zaman güvence altındadır.",
     "Apartımızdan Anadolu Üniversitesi'ne, Espark AVM'ye ve çarşı merkezine 5-10 dakikalık kısa bir yürüyüşle ulaşabilirsiniz. Ayrıca ESTÜ ve Osmangazi Üniversitesi güzergahındaki tüm toplu taşıma duraklarına da oldukça yakınız. Öğrencilerimiz, etüt ve dinlenme alanlarımızda hem derslerine odaklanabilir hem de keyifli vakit geçirebilirler.",
@@ -199,15 +218,48 @@ export const amenities = {
   title: "Konforunuz için her detay düşünüldü",
   intro:
     "Üniversite hayatınız boyunca en güvenli ve en konforlu alanda konaklamanız için uzun yıllardır aynı kalitede hizmet veriyoruz. Odalarımızdaki tüm eşyalar son derece ergonomiktir.",
+  // "description": karta üzerine gelince (veya dokununca) açılan kısa metin.
   items: [
-    { icon: ShowerHead, title: "7/24 Sıcak Su" },
-    { icon: NotebookPen, title: "Çalışma Masası ve Sandalye" },
-    { icon: Tv, title: "LCD TV" },
-    { icon: BedDouble, title: "Kaliteli Yatak ve Baza" },
-    { icon: Archive, title: "Geniş Eşya Dolabı" },
-    { icon: Bath, title: "Her Odada Banyo ve WC" },
-    { icon: Sofa, title: "Ortak Sosyal Alanlar" },
-    { icon: ShieldCheck, title: "24 Saat Güvenlik" },
+    {
+      icon: ShowerHead,
+      title: "7/24 Sıcak Su",
+      description: "Günün her saati, mevsim fark etmeksizin kesintisiz sıcak su.",
+    },
+    {
+      icon: NotebookPen,
+      title: "Çalışma Masası ve Sandalye",
+      description: "Odanızda size özel, ders çalışmaya hazır ergonomik bir köşe.",
+    },
+    {
+      icon: Tv,
+      title: "LCD TV",
+      description: "Ders arası molalarda keyifli vakit geçirebileceğiniz kişisel ekran.",
+    },
+    {
+      icon: BedDouble,
+      title: "Kaliteli Yatak ve Baza",
+      description: "Dinlendirici bir uyku için özenle seçilmiş yatak ve baza.",
+    },
+    {
+      icon: Archive,
+      title: "Geniş Eşya Dolabı",
+      description: "Tüm eşyalarınızı düzenli tutabileceğiniz ferah bir alan.",
+    },
+    {
+      icon: Bath,
+      title: "Her Odada Banyo ve WC",
+      description: "Paylaşımsız, size özel banyo ve WC ile tam mahremiyet.",
+    },
+    {
+      icon: Sofa,
+      title: "Ortak Sosyal Alanlar",
+      description: "Arkadaşlarınızla vakit geçirebileceğiniz sıcak, samimi alanlar.",
+    },
+    {
+      icon: ShieldCheck,
+      title: "24 Saat Güvenlik",
+      description: "Gün boyu görev başındaki güvenlik personeliyle içiniz rahat.",
+    },
   ] as Feature[],
 };
 
@@ -262,6 +314,9 @@ export const contact = {
     messagePlaceholder: "İletmek istedikleriniz...",
     submitWhatsapp: "WhatsApp ile Gönder",
     submitEmail: "E-posta ile Gönder",
+    // Butona basılınca kısa süreliğine görünen onay metinleri.
+    confirmWhatsapp: "WhatsApp açılıyor",
+    confirmEmail: "E-posta açılıyor",
     note: "Form göndermek için bir hesap oluşturmanıza gerek yok; mesajınız doğrudan WhatsApp veya e-posta uygulamanızda açılır.",
   },
 };

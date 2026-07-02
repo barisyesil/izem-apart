@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Check, Mail } from "lucide-react";
 import { WhatsappIcon } from "@/components/ui/brand-icons";
-import { Mail } from "lucide-react";
 import { contact, site } from "@/lib/content";
+import type { IconType } from "@/lib/types";
 
 // =====================================================================
 // İLETİŞİM FORMU (sadece ön yüz — backend YOK)
@@ -13,6 +15,11 @@ import { contact, site } from "@/lib/content";
 //   • "WhatsApp ile Gönder"  -> wa.me bağlantısını açar (metin hazır)
 //   • "E-posta ile Gönder"   -> mailto: ile e-posta uygulamasını açar
 // Böylece kullanıcı tek tıkla bize ulaşır, hiçbir altyapı gerekmez.
+//
+// NOT: Tarayıcı bize "WhatsApp gerçekten açıldı mı / e-posta gönderildi
+// mi" bilgisini vermez (bu bilgiye erişimimiz yok). Bu yüzden butonlarda
+// gösterilen onay sadece "işlem başlatıldı" anlamına gelir, "mesaj
+// ulaştı" anlamına GELMEZ — metinler de buna göre seçilmiştir.
 // =====================================================================
 export default function ContactForm() {
   const f = contact.form;
@@ -21,6 +28,8 @@ export default function ContactForm() {
   const [phone, setPhone] = useState("");
   const [roomType, setRoomType] = useState(f.roomTypeOptions[0]);
   const [message, setMessage] = useState("");
+  // Az önce hangi buton kullanıldı? Kısa bir onay göstermek için (2sn).
+  const [justSent, setJustSent] = useState<"whatsapp" | "email" | null>(null);
 
   // Form alanlarını okunaklı bir mesaja dönüştür.
   const buildText = () =>
@@ -34,19 +43,28 @@ export default function ContactForm() {
       .filter(Boolean)
       .join("\n");
 
+  const confirmBriefly = (via: "whatsapp" | "email") => {
+    setJustSent(via);
+    window.setTimeout(() => setJustSent(null), 2000);
+  };
+
   // WhatsApp'ı hazır metinle aç.
   const sendWhatsapp = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const url = `${site.whatsappHref}?text=${encodeURIComponent(buildText())}`;
     window.open(url, "_blank", "noopener,noreferrer");
+    confirmBriefly("whatsapp");
   };
 
-  // E-posta uygulamasını konu + içerik hazır şekilde aç.
-  const sendEmail = () => {
-    const subject = encodeURIComponent("İzem Bayan Apart — İletişim talebi");
-    const body = encodeURIComponent(buildText());
-    window.location.href = `${site.emailHref}?subject=${subject}&body=${body}`;
-  };
+  // E-posta uygulamasını konu + içerik hazır şekilde açacak "mailto:" bağlantısı.
+  // NOT: Bunu "window.location.href = ..." ile DEĞİL, gerçek bir <a href> ile
+  // tetikliyoruz — bazı ortamlarda (kayıtlı e-posta istemcisi olmayan
+  // tarayıcılar dâhil) location.href ataması sayfanın yeniden
+  // değerlendirilmesine yol açıp az önce girilen form bilgilerini
+  // kaybettirebiliyor; gerçek bir mailto: bağlantısı bu riski taşımaz.
+  const subject = encodeURIComponent("İzem Bayan Apart — İletişim talebi");
+  const body = encodeURIComponent(buildText());
+  const mailtoHref = `${site.emailHref}?subject=${subject}&body=${body}`;
 
   // Ortak input görünümü (tekrar yazmamak için).
   const fieldClass =
@@ -127,22 +145,76 @@ export default function ContactForm() {
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <button
           type="submit"
-          className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-espresso"
+          className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-espresso"
         >
-          <WhatsappIcon className="h-4 w-4" />
-          {f.submitWhatsapp}
+          <SubmitButtonContent
+            active={justSent === "whatsapp"}
+            icon={WhatsappIcon}
+            label={f.submitWhatsapp}
+            confirmLabel={f.confirmWhatsapp}
+          />
         </button>
-        <button
-          type="button"
-          onClick={sendEmail}
-          className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full border border-hairline px-6 text-sm font-medium text-ink transition-colors hover:border-ink hover:bg-warmwhite"
+        <a
+          href={mailtoHref}
+          onClick={() => confirmBriefly("email")}
+          className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-full border border-hairline px-6 text-sm font-medium text-ink transition-colors hover:border-ink hover:bg-warmwhite"
         >
-          <Mail className="h-4 w-4" />
-          {f.submitEmail}
-        </button>
+          <SubmitButtonContent
+            active={justSent === "email"}
+            icon={Mail}
+            label={f.submitEmail}
+            confirmLabel={f.confirmEmail}
+          />
+        </a>
       </div>
 
       <p className="mt-4 text-xs leading-relaxed text-taupe">{f.note}</p>
     </form>
+  );
+}
+
+// Buton içeriği: normalde ikon + etiket, tıklandıktan sonra kısa süreliğine
+// bir onay çentiği + "açılıyor" metnine "geçiş yapar" (morph), sonra geri döner.
+function SubmitButtonContent({
+  active,
+  icon: Icon,
+  label,
+  confirmLabel,
+}: {
+  active: boolean;
+  icon: IconType;
+  label: string;
+  confirmLabel: string;
+}) {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      {active ? (
+        <motion.span
+          key="confirm"
+          initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduceMotion ? undefined : { opacity: 0, y: -6 }}
+          transition={{ duration: 0.25 }}
+          className="inline-flex items-center gap-2"
+        >
+          <Check className="h-4 w-4" aria-hidden="true" />
+          {confirmLabel}
+        </motion.span>
+      ) : (
+        <motion.span
+          key="default"
+          initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduceMotion ? undefined : { opacity: 0, y: -6 }}
+          transition={{ duration: 0.25 }}
+          className="inline-flex items-center gap-2"
+        >
+          <Icon className="h-4 w-4" aria-hidden="true" />
+          {label}
+        </motion.span>
+      )}
+    </AnimatePresence>
   );
 }
