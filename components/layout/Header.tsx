@@ -94,7 +94,7 @@ export default function Header() {
               alt={brand.name}
               width={345}
               height={198}
-              priority
+              preload
               className={`h-10 w-auto transition-[filter] duration-300 sm:h-12 ${
                 scrolled ? "brightness-0" : ""
               }`}

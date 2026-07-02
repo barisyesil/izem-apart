@@ -111,7 +111,7 @@ export default function Hero() {
             src={hero.image}
             alt={hero.imageAlt}
             fill
-            priority
+            preload
             sizes="100vw"
             className="scale-110 object-cover"
           />
