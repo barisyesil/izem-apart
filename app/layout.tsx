@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import ChapterRail from "@/components/ui/ChapterRail";
 
 /* ---------------------------------------------------------------------
    FONTLAR (next/font ile)
@@ -74,6 +75,7 @@ export default function RootLayout({
     <html lang="tr" className={`${cormorant.variable} ${inter.variable}`}>
       <body className="flex min-h-dvh flex-col bg-cream text-ink antialiased">
         <Header />
+        <ChapterRail />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

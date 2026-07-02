@@ -4,7 +4,7 @@ import Container from "@/components/ui/Container";
 import Reveal from "@/components/ui/Reveal";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { location, site } from "@/lib/content";
+import { chapters, location, site } from "@/lib/content";
 
 // =====================================================================
 // KONUM BÖLÜMÜ
@@ -26,7 +26,11 @@ export default function Location() {
           {/* Metin */}
           <Reveal>
             <div>
-              <SectionHeading eyebrow={location.eyebrow} title={location.title} />
+              <SectionHeading
+                eyebrow={location.eyebrow}
+                number={chapters.find((c) => c.id === "konum")?.number}
+                title={location.title}
+              />
               <p className="mt-5 max-w-md text-base leading-relaxed text-taupe sm:text-lg">
                 {location.description}
               </p>

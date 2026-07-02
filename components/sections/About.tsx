@@ -5,7 +5,7 @@ import Parallax from "@/components/ui/Parallax";
 import Reveal from "@/components/ui/Reveal";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { about } from "@/lib/content";
+import { about, chapters } from "@/lib/content";
 
 // =====================================================================
 // HAKKIMIZDA BÖLÜMÜ
@@ -23,7 +23,7 @@ export default function About() {
             <div>
               <SectionHeading
                 eyebrow={about.eyebrow}
-                number="02"
+                number={chapters.find((c) => c.id === "hakkimizda")?.number}
                 title={
                   <>
                     {about.titlePrefix}{" "}

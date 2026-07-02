@@ -8,7 +8,7 @@ import Lightbox from "@/components/ui/Lightbox";
 import Reveal from "@/components/ui/Reveal";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { rooms } from "@/lib/content";
+import { chapters, rooms } from "@/lib/content";
 
 // =====================================================================
 // ODALARIMIZ BÖLÜMÜ
@@ -28,7 +28,11 @@ export default function Rooms() {
   return (
     <Section id="odalar" className="bg-cream">
       <Container>
-        <SectionHeading eyebrow={rooms.eyebrow} title={rooms.title} />
+        <SectionHeading
+          eyebrow={rooms.eyebrow}
+          number={chapters.find((c) => c.id === "odalar")?.number}
+          title={rooms.title}
+        />
         <p className="mt-4 max-w-xl text-base leading-relaxed text-taupe sm:text-lg">
           {rooms.intro}
         </p>

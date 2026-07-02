@@ -5,7 +5,7 @@ import Reveal from "@/components/ui/Reveal";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { WhatsappIcon } from "@/components/ui/brand-icons";
-import { contact, site, socials } from "@/lib/content";
+import { chapters, contact, site, socials } from "@/lib/content";
 
 // =====================================================================
 // İLETİŞİM BÖLÜMÜ
@@ -29,7 +29,11 @@ export default function Contact() {
           {/* Sol: bilgiler */}
           <Reveal>
             <div>
-              <SectionHeading eyebrow={contact.eyebrow} title={contact.title} />
+              <SectionHeading
+                eyebrow={contact.eyebrow}
+                number={chapters.find((c) => c.id === "iletisim")?.number}
+                title={contact.title}
+              />
               <p className="mt-5 max-w-md text-base leading-relaxed text-taupe sm:text-lg">
                 {contact.description}
               </p>

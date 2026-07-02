@@ -8,7 +8,7 @@ import Figure from "@/components/ui/Figure";
 import Lightbox from "@/components/ui/Lightbox";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { gallery } from "@/lib/content";
+import { chapters, gallery } from "@/lib/content";
 
 // =====================================================================
 // GALERİ BÖLÜMÜ
@@ -40,6 +40,7 @@ export default function Gallery() {
       <Container>
         <SectionHeading
           eyebrow={gallery.eyebrow}
+          number={chapters.find((c) => c.id === "galeri")?.number}
           title={gallery.title}
           align="center"
         />

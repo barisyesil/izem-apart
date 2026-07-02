@@ -6,7 +6,7 @@ import Container from "@/components/ui/Container";
 import Reveal from "@/components/ui/Reveal";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { amenities } from "@/lib/content";
+import { amenities, chapters } from "@/lib/content";
 import type { Feature } from "@/lib/types";
 
 // =====================================================================
@@ -23,7 +23,7 @@ export default function Amenities() {
       <Container>
         <SectionHeading
           eyebrow={amenities.eyebrow}
-          number="04"
+          number={chapters.find((c) => c.id === "olanaklar")?.number}
           title={amenities.title}
           align="center"
         />
