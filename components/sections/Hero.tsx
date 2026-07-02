@@ -62,6 +62,24 @@ const PETALS = [
   { left: "92%", delay: "8s", duration: "15s", size: 6 },
 ];
 
+// HeroMotif'teki 12 pencere (4 satır x 3 sütun) için sabit titreşim
+// değerleri — sırayla değil, dağınık/organik hissettiren ama sabit
+// (Math.random() DEĞİL, PETALS ile aynı gerekçe) gecikme/süre/duraklama.
+const WINDOW_GLOW = [
+  { delay: 0.4, duration: 2.6, pause: 3.5, peak: 0.55 },
+  { delay: 2.1, duration: 3.2, pause: 5.0, peak: 0.4 },
+  { delay: 4.6, duration: 2.2, pause: 2.8, peak: 0.6 },
+  { delay: 1.2, duration: 3.6, pause: 4.2, peak: 0.45 },
+  { delay: 5.4, duration: 2.4, pause: 3.0, peak: 0.5 },
+  { delay: 0.8, duration: 3.0, pause: 6.0, peak: 0.55 },
+  { delay: 3.6, duration: 2.8, pause: 3.6, peak: 0.4 },
+  { delay: 2.8, duration: 2.2, pause: 4.8, peak: 0.6 },
+  { delay: 6.2, duration: 3.4, pause: 2.6, peak: 0.5 },
+  { delay: 1.6, duration: 2.6, pause: 5.4, peak: 0.45 },
+  { delay: 4.0, duration: 3.2, pause: 3.2, peak: 0.55 },
+  { delay: 3.0, duration: 2.4, pause: 4.4, peak: 0.4 },
+];
+
 export default function Hero() {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
@@ -122,14 +140,24 @@ export default function Hero() {
         ))}
       </div>
 
-      {/* Sıcak, yavaşça "nefes alan" terracotta parıltısı */}
-      <motion.div
+      {/* Sıcak ışık huzmeleri: terracotta/brass/adaçayı tonlarında, aynı
+          nokta (75% 15%) etrafından yayılan, yavaşça kayan bir "beaming
+          lights" katmanı. Her "tepe" rengi iki yanından şeffaflığa yumuşakça
+          erir ve döngü şeffaflıktan şeffaflığa kapandığı için dikişsizdir
+          (sert kesim yok). Saf CSS (bkz. globals.css → animate-beam-drift).
+          background-size'ın yatay bileşeni (300%) keyframe'deki 300%'lik
+          kaymayla eşleşmeli — yoksa döngü sıçrar. */}
+      <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_55%_at_75%_15%,rgba(177,106,76,0.20),transparent_60%)]"
-        animate={reduce ? undefined : { opacity: [0.55, 0.9, 0.55] }}
-        transition={
-          reduce ? undefined : { duration: 9, repeat: Infinity, ease: "easeInOut" }
-        }
+        className="animate-beam-drift pointer-events-none absolute -inset-10 opacity-55 mix-blend-screen blur-[28px] [background-size:300%_240%]"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(100deg, transparent 0%, var(--color-terracotta) 15%, transparent 33%, var(--color-brass) 48%, transparent 66%, var(--color-sage-deep) 81%, transparent 100%)",
+          maskImage:
+            "radial-gradient(ellipse 85% 75% at 75% 15%, black 25%, transparent 80%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 85% 75% at 75% 15%, black 25%, transparent 80%)",
+        }}
       />
 
       {/* Metnin net okunması için karartma */}
@@ -298,27 +326,54 @@ function HeroMotif({ reduce }: { reduce: boolean }) {
           animate={reduce ? undefined : { pathLength: 1 }}
           transition={{ duration: 1.8, ease: "easeInOut" }}
         />
-        {/* Pencereler */}
+        {/* Pencereler — dış çerçeve çizilir, içine de sırayla parlayıp
+            sönen sıcak bir "ışık" dolgusu yerleşir (bkz. WINDOW_GLOW). */}
         {windowRows.map((y, rowIndex) =>
-          windowCols.map((x, colIndex) => (
-            <motion.rect
-              key={`${x}-${y}`}
-              x={x}
-              y={y}
-              width="32"
-              height="36"
-              rx="2"
-              stroke="currentColor"
-              strokeWidth="1"
-              initial={reduce ? false : { pathLength: 0, opacity: 0 }}
-              animate={reduce ? undefined : { pathLength: 1, opacity: 1 }}
-              transition={{
-                duration: 0.6,
-                delay: 0.6 + (rowIndex * 3 + colIndex) * 0.05,
-                ease: "easeOut",
-              }}
-            />
-          )),
+          windowCols.map((x, colIndex) => {
+            const glow = WINDOW_GLOW[rowIndex * 3 + colIndex];
+            return (
+              <g key={`${x}-${y}`}>
+                <motion.rect
+                  x={x}
+                  y={y}
+                  width="32"
+                  height="36"
+                  rx="2"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  initial={reduce ? false : { pathLength: 0, opacity: 0 }}
+                  animate={reduce ? undefined : { pathLength: 1, opacity: 1 }}
+                  transition={{
+                    duration: 0.6,
+                    delay: 0.6 + (rowIndex * 3 + colIndex) * 0.05,
+                    ease: "easeOut",
+                  }}
+                />
+                <motion.rect
+                  x={x + 5}
+                  y={y + 5}
+                  width="22"
+                  height="26"
+                  rx="1"
+                  fill="var(--color-cream)"
+                  opacity={reduce ? 0.3 : undefined}
+                  initial={reduce ? false : { opacity: 0 }}
+                  animate={reduce ? undefined : { opacity: [0, glow.peak, 0] }}
+                  transition={
+                    reduce
+                      ? undefined
+                      : {
+                          duration: glow.duration,
+                          repeat: Infinity,
+                          repeatDelay: glow.pause,
+                          delay: 1.6 + glow.delay,
+                          ease: "easeInOut",
+                        }
+                  }
+                />
+              </g>
+            );
+          }),
         )}
         {/* Kapı */}
         <motion.rect

@@ -131,6 +131,37 @@ body {
   animation-iteration-count: infinite;
 }
 
+/* =====================================================================
+   IŞIK HÜZMELERİ (beam-drift) — Hero arka planında yavaşça kayan, marka
+   renkleriyle (terracotta/brass/adaçayı) boyanmış ince ışık huzmeleri.
+   Saf CSS: "Hareketi azalt" açıkken yukarıdaki genel kural otomatik
+   olarak durdurur (petal-fall / marquee ile aynı desen).
+   ===================================================================== */
+@keyframes beam-drift {
+  from {
+    background-position: 50% 30%;
+  }
+  to {
+    background-position: 350% 30%;
+  }
+}
+
+@keyframes beam-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-beam-drift {
+  animation:
+    beam-drift 55s linear infinite,
+    beam-pulse 9s ease-in-out infinite;
+}
+
 /* Klavye ile gezinenler için net odak halkası (erişilebilirlik) */
 :focus-visible {
   outline: 2px solid var(--color-sage-deep);
