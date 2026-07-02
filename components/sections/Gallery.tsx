@@ -85,6 +85,11 @@ export default function Gallery() {
 // hisle ÇAKIŞMASIN diye büyüme (scale) efekti de AYNI Framer Motion
 // nesnesinde yönetilir — CSS "hover:scale" ile karışırsa ikisi birbirini
 // bozar, bu yüzden burada sadece tek bir hareket mekanizması kullanılır.
+// Figure'a loading="eager" veriyoruz: şerit gerçek scroll değil, CSS
+// translateX ile kayıyor, bu yüzden tarayıcının "görünürlüğe yakın"
+// tembel-yükleme sezgisi döngü noktasındaki kareleri geç tetikliyordu —
+// bir süre boş kalıp aniden beliriyorlardı. Fotoğraf sayısı az olduğu
+// için hepsini baştan yüklemenin maliyeti düşük.
 function GalleryPhoto({
   image,
   onOpen,
@@ -137,6 +142,7 @@ function GalleryPhoto({
         label="Foto"
         className="aspect-[4/5] w-full"
         sizes="260px"
+        loading="eager"
       />
       <span className="absolute inset-0 flex items-center justify-center bg-ink/0 opacity-0 transition-all duration-300 group-hover:bg-ink/25 group-hover:opacity-100">
         <ZoomIn className="h-7 w-7 text-cream drop-shadow" aria-hidden="true" />

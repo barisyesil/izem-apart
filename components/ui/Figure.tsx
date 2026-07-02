@@ -13,19 +13,27 @@ export default function Figure({
   label,
   className = "",
   sizes = "(max-width: 768px) 100vw, 50vw",
-  priority = false,
+  preload = false,
+  loading = "lazy",
 }: {
   src: string;
   alt: string;
   label?: string;
   className?: string;
   sizes?: string;
-  priority?: boolean;
+  // Next.js 16'da eski "priority" prop'u kaldırıldı, yerine "preload" geldi
+  // (bkz. node_modules/next/dist/docs/.../image.md). LCP/üst katman
+  // görseller için preload; görünürlükten bağımsız hemen yüklenmesi
+  // gereken (örn. sürekli kayan galeri şeridi) görseller için loading="eager".
+  preload?: boolean;
+  loading?: "lazy" | "eager";
 }) {
   if (!src) {
     return <Placeholder label={label} className={className} />;
   }
 
+  // preload ve loading aynı anda verilmemeli (Next.js dokümantasyonunun
+  // uyarısı) — preload isteniyorsa loading'i hiç geçmiyoruz.
   return (
     <div className={`relative overflow-hidden ${className}`}>
       <Image
@@ -33,8 +41,8 @@ export default function Figure({
         alt={alt}
         fill
         sizes={sizes}
-        priority={priority}
         className="object-cover"
+        {...(preload ? { preload: true } : { loading })}
       />
     </div>
   );

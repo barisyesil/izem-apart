@@ -13,8 +13,19 @@ import { useActiveSection } from "@/lib/useActiveSection";
 // "hikaye" hissini pekiştiren bir gezinme aracı — mobilde yer olmadığı
 // için sadece masaüstünde (lg ve üzeri ekranlarda) görünür.
 // =====================================================================
+// Hero ("anasayfa"), lib/content.ts → chapters listesinde bilinçli olarak
+// yok (numarasız "kapak" sayılıyor, bkz. o dosyadaki not). Ama bu yüzden
+// sayfanın en tepesindeyken rail'de hiçbir nokta aktif görünmüyordu —
+// burada, chapters'ın numaralandırma anlamını bozmadan (diğer bölümlerin
+// "02", "03" gibi numaraları hâlâ chapters'tan geliyor), sadece rail'in
+// kendi listesine numarasız bir "Anasayfa" girdisi ekliyoruz.
+const RAIL_CHAPTERS = [
+  { id: "anasayfa", number: "", label: "Anasayfa" },
+  ...chapters,
+];
+
 export default function ChapterRail() {
-  const activeId = useActiveSection(chapters.map((chapter) => chapter.id));
+  const activeId = useActiveSection(RAIL_CHAPTERS.map((chapter) => chapter.id));
 
   // Sayfa boyunca kaydırma oranı (0 → 1) — çizginin ne kadar "büyüdüğünü" belirler.
   const { scrollYProgress } = useScroll();
@@ -42,13 +53,13 @@ export default function ChapterRail() {
           className="absolute inset-y-0 left-1/2 w-px origin-top -translate-x-1/2 bg-terracotta"
         />
 
-        {chapters.map((chapter) => {
+        {RAIL_CHAPTERS.map((chapter) => {
           const isActive = activeId === chapter.id;
           return (
             <a
               key={chapter.id}
               href={`#${chapter.id}`}
-              aria-label={`${chapter.number} — ${chapter.label}`}
+              aria-label={chapter.number ? `${chapter.number} — ${chapter.label}` : chapter.label}
               aria-current={isActive ? "true" : undefined}
               className="group relative flex h-12 w-6 items-center justify-center"
             >
@@ -61,7 +72,8 @@ export default function ChapterRail() {
               />
               {/* Üzerine gelince görünen küçük etiket */}
               <span className="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-md bg-ink px-2.5 py-1 text-xs text-cream opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                {chapter.number} · {chapter.label}
+                {chapter.number ? `${chapter.number} · ` : ""}
+                {chapter.label}
               </span>
             </a>
           );

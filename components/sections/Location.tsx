@@ -85,13 +85,18 @@ export default function Location() {
           </Reveal>
         </div>
 
-        {/* Gerçek harita — tam genişlikte, şemanın altında */}
+        {/* Gerçek harita — tam genişlikte, şemanın altında.
+            loading="lazy" KASITLI OLARAK kullanılmıyor: harita en son
+            bölümlerden birinde olduğu için tarayıcının tembel-yükleme
+            sezgisi sayfaya girildiğinde onu geç fark ediyor, kullanıcı
+            hızlıca kaydırınca boş/yüklenmemiş görünüyordu. Bunun yerine
+            sayfa açılır açılmaz arka planda gömülmeye başlasın diye
+            eager (varsayılan) davranış bırakılıyor. */}
         <Reveal delay={0.15} className="mt-10">
           <div className="overflow-hidden rounded-2xl border border-hairline">
             <iframe
               src={mapEmbed}
               title="İzem Bayan Apart konum haritası"
-              loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               className="h-[320px] w-full sm:h-[380px]"
             />
