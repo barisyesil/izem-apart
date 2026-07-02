@@ -6,6 +6,7 @@ import { motion, useScroll, useSpring } from "framer-motion";
 import { Menu, Phone, X } from "lucide-react";
 import { brand, navLinks, site } from "@/lib/content";
 import { WhatsappIcon } from "@/components/ui/brand-icons";
+import { useActiveSection } from "@/lib/useActiveSection";
 
 // =====================================================================
 // ÜST BAŞLIK (HEADER)
@@ -29,7 +30,9 @@ import { WhatsappIcon } from "@/components/ui/brand-icons";
 export default function Header() {
   const [scrolled, setScrolled] = useState(false); // sayfa kaydırıldı mı?
   const [open, setOpen] = useState(false); // mobil menü açık mı?
-  const [activeId, setActiveId] = useState(""); // ekrandaki aktif bölüm
+  // Ekrandaki aktif bölüm — paylaşılan hook (bkz. lib/useActiveSection.ts).
+  // Aynı hook, sağdaki "Büyüyen İplik" rayı (ChapterRail) tarafından da kullanılır.
+  const activeId = useActiveSection(navLinks.map((link) => link.href.slice(1)));
 
   // Sayfanın en üstündeki ilerleme çubuğu için kaydırma oranı (0 → 1).
   const { scrollYProgress } = useScroll();
@@ -45,23 +48,6 @@ export default function Header() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Scroll-spy: ekranın dikey ortasındaki bölümü "aktif" kabul et.
-  useEffect(() => {
-    const sections = navLinks
-      .map((link) => document.getElementById(link.href.slice(1)))
-      .filter((el): el is HTMLElement => el !== null);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveId(entry.target.id);
-        });
-      },
-      { rootMargin: "-50% 0px -50% 0px" },
-    );
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
   }, []);
 
   // Mobil menü açıkken: arka plan kaymasını kilitle + Esc ile kapat.
