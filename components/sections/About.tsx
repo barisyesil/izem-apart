@@ -1,4 +1,5 @@
 import Container from "@/components/ui/Container";
+import CyclingWord from "@/components/ui/CyclingWord";
 import Figure from "@/components/ui/Figure";
 import Parallax from "@/components/ui/Parallax";
 import Reveal from "@/components/ui/Reveal";
@@ -20,7 +21,16 @@ export default function About() {
           {/* Metin */}
           <Reveal>
             <div>
-              <SectionHeading eyebrow={about.eyebrow} title={about.title} />
+              <SectionHeading
+                eyebrow={about.eyebrow}
+                number="02"
+                title={
+                  <>
+                    {about.titlePrefix}{" "}
+                    <CyclingWord words={about.cyclingWords} /> {about.titleSuffix}
+                  </>
+                }
+              />
               <div className="mt-6 space-y-4 text-base leading-relaxed text-taupe sm:text-lg">
                 {about.paragraphs.map((paragraph) => (
                   <p key={paragraph.slice(0, 24)}>{paragraph}</p>
