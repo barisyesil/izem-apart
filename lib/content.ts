@@ -94,10 +94,13 @@ export const hero = {
   primaryCta: { label: "Odaları Keşfet", href: "#odalar" } as CTA,
   secondaryCta: { label: "İletişime Geç", href: "#iletisim" } as CTA,
   scrollHint: "Keşfetmek için kaydırın",
-  // Hero arka plan fotoğrafı eklemek için: image: "/images/hero.jpg"
-  // Boş bırakılırsa şık koyu bir zemin gösterilir.
-  image: "",
-  imageAlt: "İzem Bayan Apart binası",
+  // Boş bırakılırsa (image: "") kendi çizdiğimiz "bina" çizgi-motifine
+  // (HeroMotif, bkz. components/sections/Hero.tsx) otomatik geri düşülür.
+  image: "/images/hero-arka-plan.png",
+  // Atmosfer/mizansen fotoğrafı olduğu için (gerçek bir apart odasının
+  // birebir fotoğrafı DEĞİL) alt metin de buna göre nötr/betimleyici —
+  // spesifik bir oda iddiası içermiyor.
+  imageAlt: "Sıcak tonlarda, davetkâr bir oturma alanı",
   // CTA butonlarının altında görünen küçük güven çipleri.
   chips: [
     { icon: ShieldCheck, title: "24 saat güvenlik" },

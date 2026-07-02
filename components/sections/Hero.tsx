@@ -18,13 +18,16 @@ import { hero } from "@/lib/content";
 // =====================================================================
 // KARŞILAMA (HERO) BÖLÜMÜ — "Canlı Kapak"
 // ---------------------------------------------------------------------
-// Sayfanın ilk, sinematik ekranı. Bilinçli olarak TAMAMEN soyut/grafik:
-// gerçek fotoğraf yerine kendi çizdiğimiz ince bir "bina" çizgi-motifi
-// (HeroMotif) kullanılır — apartın gerçek fotoğrafları (telefonla
-// çekilmiş) bu kadar büyük kullanım için yeterince "premium" değil.
-// Başlık satır satır bir "perde açılma" (wipe) efektiyle belirir, altında
-// güven çipleri, sıcak bir parıltı, ince bir yaprak (taç yaprağı) katmanı
-// ve mıknatıs gibi imleci takip eden butonlar vardır.
+// Sayfanın ilk, sinematik ekranı. Arka planda gerçek, atmosferik bir iç
+// mekan fotoğrafı (hero.image) yavaşça "yerine oturarak" (zoom-settle +
+// fade-in) açılır — modern landing page hero'larındaki animasyonlu giriş
+// hissi için. Metnin okunabilirliği için yönlü bir karartma katmanı
+// vardır: sol taraf (başlık/butonlar/çipler) koyu, sağ taraf (odanın
+// mimari detayları) daha açık bırakılır. hero.image boşsa (bkz.
+// lib/content.ts) kendi çizdiğimiz "bina" çizgi-motifine (HeroMotif)
+// otomatik geri düşer. Başlık satır satır bir "perde açılma" (wipe)
+// efektiyle belirir, altında bölücü çizgilerle ayrılmış bir güven-çipi
+// sırası ve mıknatıs gibi imleci takip eden butonlar vardır.
 // "use client": animasyon ve kaydırma tarayıcıda çalışır.
 // "Hareketi azalt" açıksa: tüm animasyonlar kapanır, içerik sabit kalır.
 // =====================================================================
@@ -50,21 +53,10 @@ const wipe: Variants = {
   }),
 };
 
-// Taç yaprağı konumları sabittir (Math.random() DEĞİL) — sunucu ve
-// tarayıcı ilk render'da aynı sonucu üretmeli (hydration uyumsuzluğu
-// olmasın diye). Her biri farklı gecikme/süre ile düşer.
-const PETALS = [
-  { left: "8%", delay: "0s", duration: "13s", size: 7 },
-  { left: "22%", delay: "3s", duration: "16s", size: 5 },
-  { left: "48%", delay: "6s", duration: "14s", size: 6 },
-  { left: "67%", delay: "1.5s", duration: "17s", size: 8 },
-  { left: "83%", delay: "4.5s", duration: "12s", size: 5 },
-  { left: "92%", delay: "8s", duration: "15s", size: 6 },
-];
-
 // HeroMotif'teki 12 pencere (4 satır x 3 sütun) için sabit titreşim
 // değerleri — sırayla değil, dağınık/organik hissettiren ama sabit
-// (Math.random() DEĞİL, PETALS ile aynı gerekçe) gecikme/süre/duraklama.
+// (Math.random() DEĞİL — sunucu/tarayıcı ilk render'da aynı sonucu
+// üretmeli, hydration uyumsuzluğu olmasın diye) gecikme/süre/duraklama.
 const WINDOW_GLOW = [
   { delay: 0.4, duration: 2.6, pause: 3.5, peak: 0.55 },
   { delay: 2.1, duration: 3.2, pause: 5.0, peak: 0.4 },
@@ -100,10 +92,13 @@ export default function Hero() {
       id="anasayfa"
       className="relative flex min-h-dvh items-center overflow-hidden bg-ink text-cream"
     >
-      {/* --- Arka plan (parallax) --- */}
+      {/* --- Arka plan (parallax + açılışta "yerine oturan" zoom) --- */}
       <motion.div
         aria-hidden="true"
         style={reduce ? undefined : { y: bgY }}
+        initial={reduce ? false : { scale: 1.14, opacity: 0 }}
+        animate={reduce ? false : { scale: 1, opacity: 1 }}
+        transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
         className="absolute inset-0"
       >
         {hero.image ? (
@@ -113,57 +108,30 @@ export default function Hero() {
             fill
             preload
             sizes="100vw"
-            className="scale-110 object-cover"
+            // Mobilde (dar/uzun ekran) object-cover fotoğrafın çoğunu yandan
+            // kırpıyor; sabit tek bir kırpma yerine yavaş, ileri-geri bir
+            // yatay kaydırmayla (animate-hero-pan) zamanla daha fazlası
+            // görünsün diye. Bu sınıf kendi @media sorgusuyla yalnızca dar
+            // ekranlarda animasyonu açar, masaüstünde sabit kadraja döner
+            // (bkz. globals.css → hero-pan; neden Tailwind sm: varyantı
+            // yerine kendi @media sorgusu kullanıldığı orada açıklanıyor).
+            className="animate-hero-pan object-cover object-[30%_38%]"
           />
         ) : (
           <HeroMotif reduce={!!reduce} />
         )}
       </motion.div>
 
-      {/* İnce, süzülerek düşen taç yaprakları (yalnızca dekoratif) */}
+      {/* Metnin net okunması için yönlü karartma: solda (başlık/butonlar)
+          koyu, sağda (fotoğrafın mimari detayları) daha açık — fotoğraf
+          hem okunabilir hem de görünür kalsın diye. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-      >
-        {PETALS.map((petal) => (
-          <span
-            key={petal.left}
-            className="animate-petal-fall absolute -top-[10%] rounded-[60%_0_60%_0] bg-terracotta/30"
-            style={{
-              left: petal.left,
-              width: petal.size,
-              height: petal.size,
-              animationDelay: petal.delay,
-              animationDuration: petal.duration,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Sıcak ışık huzmeleri: terracotta/brass/adaçayı tonlarında, aynı
-          nokta (75% 15%) etrafından yayılan, yavaşça kayan bir "beaming
-          lights" katmanı. Her "tepe" rengi iki yanından şeffaflığa yumuşakça
-          erir ve döngü şeffaflıktan şeffaflığa kapandığı için dikişsizdir
-          (sert kesim yok). Saf CSS (bkz. globals.css → animate-beam-drift).
-          background-size'ın yatay bileşeni (300%) keyframe'deki 300%'lik
-          kaymayla eşleşmeli — yoksa döngü sıçrar. */}
-      <div
-        aria-hidden="true"
-        className="animate-beam-drift pointer-events-none absolute -inset-10 opacity-55 mix-blend-screen blur-[28px] [background-size:300%_240%]"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(100deg, transparent 0%, var(--color-terracotta) 15%, transparent 33%, var(--color-brass) 48%, transparent 66%, var(--color-sage-deep) 81%, transparent 100%)",
-          maskImage:
-            "radial-gradient(ellipse 85% 75% at 75% 15%, black 25%, transparent 80%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 85% 75% at 75% 15%, black 25%, transparent 80%)",
-        }}
+        className="absolute inset-0 bg-gradient-to-r from-ink/92 via-ink/55 to-ink/15"
       />
-
-      {/* Metnin net okunması için karartma */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/35 to-ink/55"
+        className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/70 to-transparent"
       />
 
       {/* İnce film greni (premium doku) */}
@@ -195,8 +163,9 @@ export default function Hero() {
               {hero.eyebrow}
             </motion.p>
 
-            {/* Başlık — satır satır "perde açılma" ile belirir */}
-            <h1 className="font-serif text-[2.75rem] leading-[1.05] sm:text-6xl md:text-7xl">
+            {/* Başlık — satır satır "perde açılma" ile belirir. Fotoğrafın
+                üzerinde daha net ayrışsın diye ince bir gölge var. */}
+            <h1 className="font-serif text-[2.75rem] leading-[1.05] [text-shadow:0_2px_28px_rgba(0,0,0,0.4)] sm:text-6xl md:text-7xl">
               {hero.titleLines.map((line, index) => (
                 <span key={line} className="block overflow-hidden">
                   <motion.span
@@ -247,23 +216,28 @@ export default function Hero() {
               </MagneticWrap>
             </motion.div>
 
-            {/* Güven çipleri */}
+            {/* Güven çipleri — ince bir üst çizgiyle ayrılmış, aralarında
+                bölücü çizgili bir "öne çıkanlar" sırası (masaüstünde). */}
             <motion.ul
               variants={rise}
               custom={0.8}
               initial={reduce ? false : "hidden"}
               animate={reduce ? false : "show"}
-              className="mt-10 flex flex-wrap gap-x-6 gap-y-3"
+              className="mt-11 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-cream/15 pt-6"
             >
-              {hero.chips.map((chip) => {
+              {hero.chips.map((chip, index) => {
                 const Icon = chip.icon;
                 return (
                   <li
                     key={chip.title}
-                    className="inline-flex items-center gap-2 text-sm text-cream/75"
+                    className={`flex items-center gap-3 ${
+                      index > 0 ? "sm:border-l sm:border-cream/15 sm:pl-8" : ""
+                    }`}
                   >
-                    <Icon className="h-4 w-4 text-terracotta" aria-hidden="true" />
-                    {chip.title}
+                    <Icon className="h-5 w-5 text-terracotta" aria-hidden="true" />
+                    <span className="text-sm font-medium tracking-wide text-cream/90">
+                      {chip.title}
+                    </span>
                   </li>
                 );
               })}
