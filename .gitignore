@@ -43,3 +43,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI ajan araçları (sitenin kendisiyle ilgisi yok, sadece yerelde tutulur)
+CLAUDE.md
+AGENTS.md
+.claude/
