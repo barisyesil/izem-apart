@@ -115,7 +115,7 @@ export const about = {
   // Buradaki kelimeler sayfada zaten anlatılan gerçeklerdir, yeni bir iddia değildir.
   titlePrefix: "Kızlarımız için",
   titleSuffix: "bir yuva",
-  cyclingWords: ["güvenli", "huzurlu", "hijyenik", "konforlu", "merkezi"],
+  cyclingWords: ["güvenli", "huzurlu", "hijyenik", "konforlu ", "merkezi"],
   paragraphs: [
     "İzem Bayan Apart; merkezi konumu, konforlu odaları ve sıcak aile ortamıyla öğrencilere huzurla konaklayabilecekleri bir yaşam alanı sunar. 7/24 görev yapan güvenlik personelimiz ve kesintisiz kamera sistemimiz sayesinde güvenliğiniz her zaman güvence altındadır.",
     "Apartımızdan Anadolu Üniversitesi'ne, Espark AVM'ye ve çarşı merkezine 5-10 dakikalık kısa bir yürüyüşle ulaşabilirsiniz. Ayrıca ESTÜ ve Osmangazi Üniversitesi güzergahındaki tüm toplu taşıma duraklarına da oldukça yakınız. Öğrencilerimiz, etüt ve dinlenme alanlarımızda hem derslerine odaklanabilir hem de keyifli vakit geçirebilirler.",
