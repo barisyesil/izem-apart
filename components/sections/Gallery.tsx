@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, type CSSProperties, type MouseEvent } from "react";
+import { useState, type MouseEvent } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import AutoScroll from "embla-carousel-auto-scroll";
 import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import { ZoomIn } from "lucide-react";
 import Container from "@/components/ui/Container";
@@ -15,28 +17,53 @@ import type { GalleryImage } from "@/lib/types";
 // =====================================================================
 // GALERİ BÖLÜMÜ
 // ---------------------------------------------------------------------
-// Sabit bir ızgara yerine, TÜM fotoğrafları içeren, sürekli kayan
-// ("marquee") tek satırlık bir şerit. Üzerine gelince/dokununca durur.
+// TÜM fotoğrafları içeren, sürekli kayan tek satırlık bir şerit.
 // Herhangi bir fotoğrafa tıklandığında, o fotoğraf açık şekilde TÜM
 // galeriyi gezebileceğiniz paylaşılan Lightbox açılır. Masaüstünde her
 // fotoğraf, imlecin pozisyonuna göre hafifçe eğilir (3B tilt).
 //
-// "Hareketi azalt" açıksa: şerit çoğaltılmaz ve otomatik KAYMAZ; bunun
-// yerine elle sağa/sola kaydırabileceğiniz sade bir sıraya döner.
+// KAYDIRMA MEKANİZMASI — Embla Carousel (+ AutoScroll eklentisi):
+// Önceki iki sürüm (CSS keyframe, sonra elle requestAnimationFrame)
+// düşük performanslı cihazlarda / yavaş ağlarda "fotoğraflar ara ara
+// kayboluyor" şikayetine yol açtı. Embla, shadcn/ui'nin Carousel'inin
+// de altında yatan, savaşta test edilmiş kaydırma motorudur: sonsuz
+// döngüyü DOM kopyalamadan (transform konumlandırmayla) çözer, parmakla
+// sürükleme/fırlatma desteği hazır gelir ve görünürlük hesapları
+// tarayıcı farklarına dayanıklıdır.
+//  - loop: sonsuz şerit hissi
+//  - dragFree: kaydırınca "kartlara oturmadan" serbest akış
+//  - AutoScroll: kesintisiz, sabit hızlı kayma; üzerine gelince veya
+//    içine klavye odağı girince durur, ayrılınca kaldığı yerden sürer.
+// "Hareketi azalt" açıksa: otomatik kayma tamamen kapalıdır; şerit
+// elle kaydırılabilir sade bir sıraya döner.
 // =====================================================================
 export default function Gallery() {
   const images = gallery.images;
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const reduceMotion = useReducedMotion();
+  const isFine = useFinePointer();
 
-  // Kesintisiz döngü için şeridi normal modda iki katına çıkarıyoruz
-  // (translateX(-50%) tam olarak bir kopyanın genişliği kadar kayar).
-  const track = reduceMotion ? images : [...images, ...images];
-
-  // Fotoğraf sayısına göre hız — daha çok fotoğraf, biraz daha uzun tur.
-  const trackStyle = {
-    "--marquee-duration": `${images.length * 4}s`,
-  } as CSSProperties;
+  const [emblaRef] = useEmblaCarousel(
+    {
+      loop: true,
+      dragFree: true,
+      skipSnaps: true,
+      align: "start",
+      containScroll: false,
+    },
+    reduceMotion
+      ? []
+      : [
+          AutoScroll({
+            // px/kare (~60fps'te 1.1 ≈ saniyede ~66px — eski şeridin hızı).
+            speed: 1.1,
+            startDelay: 0,
+            stopOnInteraction: false, // sürükleme bitince kaldığı yerden devam
+            stopOnMouseEnter: isFine, // fotoğrafa bakmak/tıklamak için duraklat
+            stopOnFocusIn: true, // klavye erişilebilirliği
+          }),
+        ],
+  );
 
   return (
     <Section id="galeri" className="bg-sand">
@@ -53,19 +80,15 @@ export default function Gallery() {
       </Container>
 
       {/* Şerit, sayfa genişliğini taşarak kenarlara kadar uzanır. */}
-      <div className="mt-12 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div
-          style={trackStyle}
-          className={`flex w-max gap-4 px-5 sm:gap-5 sm:px-8 ${
-            reduceMotion ? "" : "animate-marquee"
-          }`}
-        >
-          {track.map((image, trackIndex) => (
-            <GalleryPhoto
-              key={`${image.src}-${trackIndex}`}
-              image={image}
-              onOpen={() => setActiveIndex(trackIndex % images.length)}
-            />
+      <div ref={emblaRef} className="mt-12 overflow-hidden" aria-label="Fotoğraf şeridi">
+        <div className="flex touch-pan-y">
+          {images.map((image, index) => (
+            <div
+              key={image.src}
+              className="min-w-0 flex-none pl-4 first:pl-5 sm:pl-5 sm:first:pl-8"
+            >
+              <GalleryPhoto image={image} onOpen={() => setActiveIndex(index)} />
+            </div>
           ))}
         </div>
       </div>
@@ -85,11 +108,10 @@ export default function Gallery() {
 // hisle ÇAKIŞMASIN diye büyüme (scale) efekti de AYNI Framer Motion
 // nesnesinde yönetilir — CSS "hover:scale" ile karışırsa ikisi birbirini
 // bozar, bu yüzden burada sadece tek bir hareket mekanizması kullanılır.
-// Figure'a loading="eager" veriyoruz: şerit gerçek scroll değil, CSS
-// translateX ile kayıyor, bu yüzden tarayıcının "görünürlüğe yakın"
-// tembel-yükleme sezgisi döngü noktasındaki kareleri geç tetikliyordu —
-// bir süre boş kalıp aniden beliriyorlardı. Fotoğraf sayısı az olduğu
-// için hepsini baştan yüklemenin maliyeti düşük.
+// Figure'a loading="eager" veriyoruz: şerit gerçek scroll değil, Embla
+// transform ile kaydırıyor; tarayıcının "görünürlüğe yakın" tembel-
+// yükleme sezgisi kareleri geç tetikleyebilirdi. Fotoğraflar optimize
+// WebP olduğu için hepsini baştan yüklemenin maliyeti düşük.
 function GalleryPhoto({
   image,
   onOpen,
@@ -127,7 +149,7 @@ function GalleryPhoto({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       aria-label={`${image.alt} — büyüt`}
-      className="group relative block w-[210px] shrink-0 overflow-hidden rounded-xl sm:w-[260px]"
+      className="group relative block w-[210px] shrink-0 cursor-pointer overflow-hidden rounded-xl sm:w-[260px]"
       style={
         tiltEnabled
           ? { rotateX: springRotateX, rotateY: springRotateY, transformPerspective: 600 }
