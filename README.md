@@ -67,7 +67,7 @@ npm run lint     # run ESLint
 ## Editing content
 
 - **Text, phone, address, rooms, amenities, social links** → edit [`lib/content.ts`](lib/content.ts). You don't need to touch the components.
-- **Photos** → drop image files into `public/` (e.g. `public/images/oda-tek.jpg`) and set the matching `image` / `src` field in `lib/content.ts`. Empty fields show an elegant placeholder.
+- **Photos** → drop the raw file into `image-sources/` (git-ignored, local-only), run `npm run optimize-images` to generate a compressed `.webp` in `public/images/` plus a blur placeholder in `lib/image-manifest.ts`, then set the matching `image` / `src` field in `lib/content.ts` (e.g. `public/images/oda-tek.webp`). Empty fields show an elegant placeholder.
 - **Colors & fonts** → `app/globals.css` (the `@theme` block).
 
 ## Notes

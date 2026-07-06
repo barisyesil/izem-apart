@@ -129,21 +129,34 @@ export const site = {
 
 ## 7. Fotoğraf ekleme / değiştirme
 
-Fotoğraflar `public/images/` klasöründedir (örn. `tek-kisilik-odalar_1.jpg`).
-Boş bırakılan (`src: ""`) alanlar şık bir yer tutucuyla gösterilir. Yeni bir
-fotoğraf eklemek veya değiştirmek için:
+Sitede gösterilen fotoğraflar `public/images/` klasöründe, **sıkıştırılmış
+`.webp` formatında** durur (örn. `tek-kisilik-odalar_1.webp`). Ham/orijinal
+fotoğraflar (telefondan çıkan `.jpg`/`.png`) ise `image-sources/` klasöründe
+tutulur — bu klasör depoya (git'e) hiç gitmez, sadece sizin bilgisayarınızda
+durur. Boş bırakılan (`src: ""`) alanlar şık bir yer tutucuyla gösterilir.
 
-1. Fotoğrafı `public/images/` klasörüne koyun.
-2. `lib/content.ts` içinde ilgili alanı doldurun:
+Yeni bir fotoğraf eklemek veya değiştirmek için:
+
+1. Ham fotoğrafı `image-sources/` klasörüne koyun (klasör yoksa oluşturun).
+2. Terminalde şu komutu çalıştırın:
+
+   ```
+   npm run optimize-images
+   ```
+
+   Bu komut `image-sources/` içindeki HER fotoğrafı küçük, hızlı yüklenen
+   bir `.webp` kopyasına çevirip `public/images/` klasörüne yazar (aynı
+   dosya adıyla, sadece uzantısı `.webp` olur).
+3. `lib/content.ts` içinde ilgili alanı, oluşan `.webp` yoluyla doldurun:
 
 ```ts
 {
   name: "Tek Kişilik Oda",
-  image: "/images/oda-tek.jpg",   // ← kapak fotoğrafı ("/" ile başlayan yol)
+  image: "/images/oda-tek.webp",   // ← kapak fotoğrafı ("/" ile başlayan yol, .webp)
   imageAlt: "İzem Apart tek kişilik oda",  // ← görseli göremeyenler için açıklama
   gallery: [                       // ← bu odaya tıklayınca açılacak TÜM fotoğraflar
-    { src: "/images/oda-tek.jpg", alt: "Tek kişilik oda — görünüm 1" },
-    { src: "/images/oda-tek-2.jpg", alt: "Tek kişilik oda — görünüm 2" },
+    { src: "/images/oda-tek.webp", alt: "Tek kişilik oda — görünüm 1" },
+    { src: "/images/oda-tek-2.webp", alt: "Tek kişilik oda — görünüm 2" },
   ],
 }
 ```
@@ -155,8 +168,9 @@ fotoğraf eklemek veya değiştirmek için:
 > oraya eklemek için o listeye bir satır eklemeniz yeterli.
 
 > İpucu: Dosya adlarında **Türkçe karakter ve boşluk kullanmayın**
-> (`oda-tek.jpg` iyi, `Oda Tek.jpg` kötü). Fotoğrafları yüklemeden önce
-> küçültmek (örn. genişlik ~1600px) sayfayı hızlandırır.
+> (`oda-tek.jpg` iyi, `Oda Tek.jpg` kötü) — bu kural `image-sources/`'a
+> koyduğunuz ham dosya için geçerli, `npm run optimize-images` boyut
+> küçültmeyi zaten sizin için yapar.
 
 ---
 
