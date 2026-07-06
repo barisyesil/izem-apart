@@ -188,7 +188,7 @@ function RoomCard({
       {/* --- İçerik --- */}
       <div className="flex flex-1 flex-col p-6 sm:p-8">
         <span className="text-xs font-medium uppercase tracking-[0.24em] text-terracotta-deep">
-          Oda 0{order + 1}
+         
         </span>
         <div className="mt-2 flex flex-wrap items-center gap-3">
           <h3 className="font-serif text-3xl text-espresso sm:text-4xl">

@@ -195,7 +195,7 @@ export const rooms = {
       name: "Çift Kişilik Oda",
       capacity: "2 kişilik",
       description:
-        "İki kişi konaklayabileceğiniz odalarımız geniş ve ferah yapısıyla kendi alanınızı yaratmanıza imkân tanır. Üst düzeyde güvenlik sağlanan apartımızda aile sıcaklığında, keyifle yaşayabilirsiniz.",
+        "İki kişi konaklayabileceğiniz odalarımız geniş ve ferah yapısıyla kendi alanınızı yaratmanıza imkân tanır. Kaliteli, konforlu ve güvenli apartımızda, keyifle yaşayabilirsiniz.",
       features: [
         "İki kişilik kullanım",
         "Odaya özel banyo ve WC",
