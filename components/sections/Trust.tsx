@@ -31,7 +31,9 @@ export default function Trust() {
         <div className="mt-12 grid gap-8 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4">
           {trust.items.map((item, index) => (
             <Reveal key={item.title} delay={index * 0.06}>
-              <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
+              {/* PDF revizesi: ikon/logolar her ekran boyutunda ORTALI dursun
+                  (eskiden masaüstünde sola yaslanıyordu). */}
+              <div className="flex flex-col items-center text-center">
                 <TrustIcon icon={item.icon} />
                 <h3 className="mt-5 font-serif text-xl text-espresso">
                   {item.title}
