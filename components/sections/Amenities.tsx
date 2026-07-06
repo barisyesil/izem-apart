@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import Container from "@/components/ui/Container";
 import Reveal from "@/components/ui/Reveal";
 import Section from "@/components/ui/Section";
@@ -14,8 +14,12 @@ import type { Feature } from "@/lib/types";
 // ---------------------------------------------------------------------
 // Odalardaki ve aparttaki imkânları, kalabalık görünmeyen ferah bir
 // ızgarada (mobilde 2, masaüstünde 4 sütun) ikonlarla listeler.
-// Her kartın üzerine gelince (masaüstü) veya dokununca/odaklanınca
-// (mobil / klavye) kısa bir açıklama açılır.
+// Her kartın açıklaması, kart ekrana girdiğinde KENDİLİĞİNDEN (tıklama
+// veya üzerine gelme gerekmeden) açılır; aynı anda ekrana giren kartlar
+// (bir satır) sırayla, birer birer açılır (bkz. AmenityCard'taki gecikme
+// hesabı). Bu davranış mobil ve masaüstünde AYNIDIR: mobilde kullanıcı
+// aşağı kaydırdıkça her yeni satır ekrana girince kendi açıklamalarını
+// sırayla açar.
 // =====================================================================
 export default function Amenities() {
   return (
@@ -34,7 +38,7 @@ export default function Amenities() {
         <div className="mt-12 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
           {amenities.items.map((item, index) => (
             <Reveal key={item.title} delay={(index % 4) * 0.05}>
-              <AmenityCard item={item} />
+              <AmenityCard item={item} index={index} />
             </Reveal>
           ))}
         </div>
@@ -46,27 +50,41 @@ export default function Amenities() {
 // Tek bir olanak kartı.
 // Açıklama için gereken yer BAŞTAN ayrılır (min-h ile); böylece açılınca
 // ızgaradaki diğer kartlar aşağı kaymaz — sadece görünürlüğü değişir.
-// "active" durumu üç yoldan biriyle tetiklenir: fare ile üzerine gelme,
-// klavye ile odaklanma (WCAG 1.4.13 gereği hover ile aynı davranmalı) veya
-// mobilde dokunma (tap toggle).
-function AmenityCard({ item }: { item: Feature }) {
+// "revealed" durumu, kart görünüme girdiğinde (useInView) OTOMATİK true
+// olur — kartın ızgaradaki konumuna (index % 4) göre küçük, kademeli bir
+// gecikmeyle; böylece aynı satırdaki kartlar sırayla (soldan sağa)
+// açılıyormuş hissi verir. Üzerine gelme/odaklanma da (masaüstü/klavye)
+// açıklamayı erken göstermeye devam eder — otomatik açılışı beklemeden
+// önizleme imkânı için.
+function AmenityCard({ item, index }: { item: Feature; index: number }) {
   const Icon = item.icon;
   const reduceMotion = useReducedMotion();
   const [hoverOrFocus, setHoverOrFocus] = useState(false);
-  const [tapped, setTapped] = useState(false);
-  const active = hoverOrFocus || tapped;
+  const [revealed, setRevealed] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(cardRef, { once: true, amount: 0.5 });
+
+  useEffect(() => {
+    // "Hareketi azalt" açıksa zaten aşağıdaki render'da "active || reduceMotion"
+    // ile anında gösteriliyor — burada ayrıca state güncellemeye gerek yok.
+    if (!inView || reduceMotion) return;
+    // Satırdaki konuma göre kademeli gecikme — "birer birer açılma" hissi.
+    const timer = setTimeout(() => setRevealed(true), 250 + (index % 4) * 160);
+    return () => clearTimeout(timer);
+  }, [inView, index, reduceMotion]);
+
+  const active = revealed || hoverOrFocus;
 
   return (
     <motion.div
+      ref={cardRef}
       tabIndex={0}
       onMouseEnter={() => setHoverOrFocus(true)}
       onMouseLeave={() => setHoverOrFocus(false)}
       onFocus={() => setHoverOrFocus(true)}
       onBlur={() => setHoverOrFocus(false)}
-      onClick={() => setTapped((t) => !t)}
-      className="flex h-full min-h-[188px] cursor-pointer flex-col items-start gap-3 rounded-xl border border-hairline bg-warmwhite p-4 transition-colors duration-300 hover:border-sage/50 hover:bg-cream sm:p-6"
+      className="flex h-full min-h-[188px] flex-col items-start gap-3 rounded-xl border border-hairline bg-warmwhite p-4 transition-colors duration-300 hover:border-sage/50 hover:bg-cream sm:p-6"
       whileHover={reduceMotion ? undefined : { y: -6 }}
-      whileTap={reduceMotion ? undefined : { scale: 0.97 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
       <span
