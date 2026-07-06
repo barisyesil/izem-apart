@@ -96,7 +96,7 @@ export const hero = {
   scrollHint: "Keşfetmek için kaydırın",
   // Boş bırakılırsa (image: "") kendi çizdiğimiz "bina" çizgi-motifine
   // (HeroMotif, bkz. components/sections/Hero.tsx) otomatik geri düşülür.
-  image: "/images/hero-arka-plan.png",
+  image: "/images/hero-arka-plan.webp",
   // Atmosfer/mizansen fotoğrafı olduğu için (gerçek bir apart odasının
   // birebir fotoğrafı DEĞİL) alt metin de buna göre nötr/betimleyici —
   // spesifik bir oda iddiası içermiyor.
@@ -124,7 +124,7 @@ export const about = {
     "Apartımızdan Anadolu Üniversitesi'ne, Espark AVM'ye ve çarşı merkezine 5-10 dakikalık kısa bir yürüyüşle ulaşabilirsiniz. Ayrıca ESTÜ ve Osmangazi Üniversitesi güzergahındaki tüm toplu taşıma duraklarına da oldukça yakınız. Öğrencilerimiz, etüt ve dinlenme alanlarımızda hem derslerine odaklanabilir hem de keyifli vakit geçirebilirler.",
      ],
   signature: "İzem Bayan Apart",
-  image: "/images/apart-hakkimizda.jpg",
+  image: "/images/apart-hakkimizda.webp",
   imageAlt: "İzem Bayan Apart bina dışından görünüm",
 };
 
@@ -179,13 +179,13 @@ export const rooms = {
       ],
       // Ana küçük resim (kapak fotoğrafı). Tıklanınca aşağıdaki "gallery"
       // listesindeki TÜM fotoğraflar galeri olarak açılır.
-      image: "/images/tek-kisilik-odalar_1.jpg",
+      image: "/images/tek-kisilik-odalar_1.webp",
       imageAlt: "İzem Bayan Apart tek kişilik oda",
       gallery: [
-        { src: "/images/tek-kisilik-odalar_1.jpg", alt: "Tek kişilik oda — görünüm 1" },
-        { src: "/images/tek-kisilik-odalar_2.jpg", alt: "Tek kişilik oda — görünüm 2" },
-        { src: "/images/tek-kisilik-odalar_3.jpg", alt: "Tek kişilik oda — görünüm 3" },
-        { src: "/images/tek-kisilik-odalar_4.jpg", alt: "Tek kişilik oda — görünüm 4" },
+        { src: "/images/tek-kisilik-odalar_1.webp", alt: "Tek kişilik oda — görünüm 1" },
+        { src: "/images/tek-kisilik-odalar_2.webp", alt: "Tek kişilik oda — görünüm 2" },
+        { src: "/images/tek-kisilik-odalar_3.webp", alt: "Tek kişilik oda — görünüm 3" },
+        { src: "/images/tek-kisilik-odalar_4.webp", alt: "Tek kişilik oda — görünüm 4" },
       ] as GalleryImage[],
     },
     {
@@ -202,14 +202,14 @@ export const rooms = {
         "LCD TV",
         "Kaliteli yatak ve baza",
       ],
-      image: "/images/cift-kisilik-odalar_1.jpg",
+      image: "/images/cift-kisilik-odalar_1.webp",
       imageAlt: "İzem Bayan Apart çift kişilik oda",
       gallery: [
-        { src: "/images/cift-kisilik-odalar_1.jpg", alt: "Çift kişilik oda — görünüm 1" },
-        { src: "/images/cift-kisilik-odalar_2.jpg", alt: "Çift kişilik oda — görünüm 2" },
-        { src: "/images/cift-kisilik-odalar_3.jpg", alt: "Çift kişilik oda — görünüm 3" },
-        { src: "/images/cift-kisilik-odalar_4.jpg", alt: "Çift kişilik oda — görünüm 4" },
-        { src: "/images/cift-kisilik-odalar_5.jpg", alt: "Çift kişilik oda — görünüm 5" },
+        { src: "/images/cift-kisilik-odalar_1.webp", alt: "Çift kişilik oda — görünüm 1" },
+        { src: "/images/cift-kisilik-odalar_2.webp", alt: "Çift kişilik oda — görünüm 2" },
+        { src: "/images/cift-kisilik-odalar_3.webp", alt: "Çift kişilik oda — görünüm 3" },
+        { src: "/images/cift-kisilik-odalar_4.webp", alt: "Çift kişilik oda — görünüm 4" },
+        { src: "/images/cift-kisilik-odalar_5.webp", alt: "Çift kişilik oda — görünüm 5" },
       ] as GalleryImage[],
     },
   ] as Room[],
@@ -277,26 +277,28 @@ export const location = {
 
 // --- Galeri ---
 // Buradaki TÜM fotoğraflar en alttaki galeri şeridinde sürekli kayar.
-// Yeni fotoğraf eklemek için: dosyayı public/images/ içine koyup buraya
-// { src: "/images/dosya-adi.jpg", alt: "..." } olarak bir satır ekleyin.
+// Yeni fotoğraf eklemek için: jpg/png dosyayı public/images/ içine koyun,
+// terminalde "npm run optimize-images" çalıştırın (hafif .webp kopyasını
+// ve bulanık ön izlemeyi üretir), sonra buraya
+// { src: "/images/dosya-adi.webp", alt: "..." } olarak bir satır ekleyin.
 export const gallery = {
   eyebrow: "Galeri",
   title: "İzem'den kareler",
   intro:
     "Odalarımızdan ve ortak alanlarımızdan gerçek kareler. Bir fotoğrafa tıklayarak tüm galeriyi gezebilirsiniz.",
   images: [
-    { src: "/images/bina-girisi-1.jpg", alt: "İzem Bayan Apart bina girişi 1" },
-    { src: "/images/bina-girisi-2.jpg", alt: "İzem Bayan Apart bina girişi 2" },
-    { src: "/images/ortak-alan-1.jpg", alt: "İzem Bayan Apart ortak yaşam alanı" },
-    { src: "/images/tek-kisilik-odalar_1.jpg", alt: "Tek kişilik oda — görünüm 1" },
-    { src: "/images/tek-kisilik-odalar_2.jpg", alt: "Tek kişilik oda — görünüm 2" },
-    { src: "/images/tek-kisilik-odalar_3.jpg", alt: "Tek kişilik oda — görünüm 3" },
-    { src: "/images/tek-kisilik-odalar_4.jpg", alt: "Tek kişilik oda — görünüm 4" },
-    { src: "/images/cift-kisilik-odalar_1.jpg", alt: "Çift kişilik oda — görünüm 1" },
-    { src: "/images/cift-kisilik-odalar_2.jpg", alt: "Çift kişilik oda — görünüm 2" },
-    { src: "/images/cift-kisilik-odalar_3.jpg", alt: "Çift kişilik oda — görünüm 3" },
-    { src: "/images/cift-kisilik-odalar_4.jpg", alt: "Çift kişilik oda — görünüm 4" },
-    { src: "/images/cift-kisilik-odalar_5.jpg", alt: "Çift kişilik oda — görünüm 5" },
+    { src: "/images/bina-girisi-1.webp", alt: "İzem Bayan Apart bina girişi 1" },
+    { src: "/images/bina-girisi-2.webp", alt: "İzem Bayan Apart bina girişi 2" },
+    { src: "/images/ortak-alan-1.webp", alt: "İzem Bayan Apart ortak yaşam alanı" },
+    { src: "/images/tek-kisilik-odalar_1.webp", alt: "Tek kişilik oda — görünüm 1" },
+    { src: "/images/tek-kisilik-odalar_2.webp", alt: "Tek kişilik oda — görünüm 2" },
+    { src: "/images/tek-kisilik-odalar_3.webp", alt: "Tek kişilik oda — görünüm 3" },
+    { src: "/images/tek-kisilik-odalar_4.webp", alt: "Tek kişilik oda — görünüm 4" },
+    { src: "/images/cift-kisilik-odalar_1.webp", alt: "Çift kişilik oda — görünüm 1" },
+    { src: "/images/cift-kisilik-odalar_2.webp", alt: "Çift kişilik oda — görünüm 2" },
+    { src: "/images/cift-kisilik-odalar_3.webp", alt: "Çift kişilik oda — görünüm 3" },
+    { src: "/images/cift-kisilik-odalar_4.webp", alt: "Çift kişilik oda — görünüm 4" },
+    { src: "/images/cift-kisilik-odalar_5.webp", alt: "Çift kişilik oda — görünüm 5" },
   ] as GalleryImage[],
 };
 
