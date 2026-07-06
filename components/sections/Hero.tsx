@@ -167,7 +167,13 @@ export default function Hero() {
                 üzerinde daha net ayrışsın diye ince bir gölge var. */}
             <h1 className="font-serif text-[2.75rem] leading-[1.05] [text-shadow:0_2px_28px_rgba(0,0,0,0.4)] sm:text-6xl md:text-7xl">
               {hero.titleLines.map((line, index) => (
-                <span key={line} className="block overflow-hidden">
+                // pb-[0.2em]: "perde açılma" efekti için gereken overflow-hidden,
+                // sıkı leading-[1.05] ile birleşince "y" gibi alt kuyruklu (descender)
+                // harfleri kırpıyordu. Bu alt boşluk, animasyonun kayma mesafesini
+                // (iç motion.span'ın KENDİ yüksekliğine göre hesaplanıyor) etkilemeden
+                // kırpma sınırını aşağı iter — em birimi olduğu için her ekran
+                // boyutunda (sm:text-6xl, md:text-7xl) orantılı kalır.
+                <span key={line} className="block overflow-hidden pb-[0.2em]">
                   <motion.span
                     className="block"
                     variants={wipe}
