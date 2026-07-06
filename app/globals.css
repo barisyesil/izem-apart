@@ -51,8 +51,21 @@ html {
   /* Çapa bağlantılarında (#bolum) yumuşak kaydırma */
   scroll-behavior: smooth;
   /* Çapa hedefleri sabit başlığın ALTINA insin diye üst boşluk.
-     Tek offset kaynağı budur — bölümlerde ayrıca scroll-mt kullanMIYORUZ. */
-  scroll-padding-top: var(--header-h);
+     Tek offset kaynağı budur — bölümlerde ayrıca scroll-mt kullanMIYORUZ.
+     Başlık yüksekliğinden bir miktar DÜŞÜYORUZ: her bölümün kendi üst
+     iç boşluğu (py-20/28) zaten büyük; ofseti tam başlık yüksekliğinde
+     bırakınca menüden gelen ziyaretçi ekranın üst yarısında sadece boş
+     zemin görüyordu (PDF revizesi: "sayfa doğru bölüme daha iyi
+     ortalanabilir"). Bu düşüm, bölüm başlığını ekranın rahat okunan üst
+     bandına getirir; kesilen kısım yalnızca boş iç boşluktur. */
+  scroll-padding-top: calc(var(--header-h) - 2.5rem);
+}
+
+@media (min-width: 640px) {
+  html {
+    /* Masaüstünde bölüm iç boşluğu daha da büyük (py-28) → düşüm de büyük. */
+    scroll-padding-top: calc(var(--header-h) - 3.5rem);
+  }
 }
 
 body {
