@@ -116,7 +116,9 @@ export const about = {
   eyebrow: "Hakkımızda",
   // Başlıktaki tek kelime CyclingWord ile döner (bkz. components/sections/About.tsx).
   // Buradaki kelimeler sayfada zaten anlatılan gerçeklerdir, yeni bir iddia değildir.
-  titlePrefix: "Kızlarımız için",
+  // Üniversite öğrencilerinin yetişkin bireyler olduğu göz önüne alınarak
+  // "Kızlarımız için" yerine daha tarafsız ve kapsayıcı bir ifade seçildi.
+  titlePrefix: "Öğrencilerimiz için",
   titleSuffix: "bir yuva",
   cyclingWords: ["güvenli", "huzurlu", "hijyenik", "konforlu ", "merkezi"],
   paragraphs: [
