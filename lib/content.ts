@@ -44,7 +44,7 @@ export const brand = {
   // Logo BEYAZ (şeffaf zeminli) çizilmiş; bu yüzden Header.tsx içinde
   // sayfa kaydırılıp zemin açık renge dönünce logoya "brightness-0" filtresi
   // uygulanır (beyaz -> siyah/koyu). Logoyu değiştirirseniz bu detayı unutmayın.
-  logo: "/images/logo.png",
+  logo: "/images/site-mark.png",
 };
 
 // --- İletişim bilgileri (tek yerden) ---
