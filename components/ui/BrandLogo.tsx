@@ -26,8 +26,12 @@ export default function BrandLogo({
   const MAX_RETRIES = 2;
 
   if (attempt > MAX_RETRIES) {
+    // className genelde <img> için verilen yükseklik sınıflarını (h-10 vb.)
+    // içerir — bunlar metnin punto boyutunu etkilemez, bu yüzden görsel
+    // hiyerarşi için "text-xl" burada AYRICA belirtiliyor (mobil menüdeki
+    // "İzem" yedek metniyle aynı büyüklük, bkz. Header.tsx).
     return (
-      <span className={`font-serif text-espresso ${className}`}>
+      <span className={`font-serif text-xl text-espresso ${className}`}>
         {brand.shortName}
       </span>
     );
