@@ -37,8 +37,22 @@ import type { GalleryImage } from "@/lib/types";
 // "Hareketi azalt" açıksa: otomatik kayma tamamen kapalıdır; şerit
 // elle kaydırılabilir sade bir sıraya döner.
 // =====================================================================
+// Şerit, Embla'nın KENDİ iç döngü mekanizmasına (loop:true) güveniyor —
+// ama Embla, TÜM fotoğrafların toplam genişliği görünüm alanından DAHA
+// DAR kalırsa (bkz. node_modules/embla-carousel .../embla-carousel.esm.js
+// SlideLooper.canLoop()) döngüyü sessizce "loop:false"a düşürüyor. Tarayıcı
+// %50'nin altına yakınlaştırıldığında (zoom out) görünüm alanı CSS piksel
+// cinsinden ÇOK genişleyip 12 fotoğrafın tek kopyasının toplam genişliğini
+// aşabiliyor — bu noktada AutoScroll, şeridin sonuna gelince döngü YOKMUŞ
+// gibi kalıcı olarak DURUYORDU ("görseller bitince tekrar başlamıyor").
+// Çözüm: şeridi birkaç kez ardı ardına çoğaltıp toplam genişliği, olası
+// en geniş (en uzak zoom) görünüm alanından bile fazla tutmak — tıpkı
+// eski (Embla öncesi) sürümün aynı sebeple yaptığı gibi.
+const TRACK_COPIES = 4;
+
 export default function Gallery() {
   const images = gallery.images;
+  const track = Array.from({ length: TRACK_COPIES }, () => images).flat();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const reduceMotion = useReducedMotion();
   const isFine = useFinePointer();
@@ -97,12 +111,15 @@ export default function Gallery() {
       {/* Şerit, sayfa genişliğini taşarak kenarlara kadar uzanır. */}
       <div ref={emblaRef} className="mt-12 overflow-hidden" aria-label="Fotoğraf şeridi">
         <div className="flex touch-pan-y">
-          {images.map((image, index) => (
+          {track.map((image, trackIndex) => (
             <div
-              key={image.src}
+              key={`${image.src}-${trackIndex}`}
               className="min-w-0 flex-none pl-4 first:pl-5 sm:pl-5 sm:first:pl-8"
             >
-              <GalleryPhoto image={image} onOpen={() => setActiveIndex(index)} />
+              <GalleryPhoto
+                image={image}
+                onOpen={() => setActiveIndex(trackIndex % images.length)}
+              />
             </div>
           ))}
         </div>
