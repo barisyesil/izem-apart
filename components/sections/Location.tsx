@@ -40,7 +40,7 @@ export default function Location() {
   const mapLink = `https://www.google.com/maps/search/?api=1&query=${query}`;
 
   return (
-    <Section id="konum" className="bg-cream">
+    <Section id="konum" className="bg-sand">
       <Container>
         <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-16">
           {/* Metin */}

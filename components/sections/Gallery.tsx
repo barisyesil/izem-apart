@@ -95,7 +95,7 @@ export default function Gallery() {
   }, [emblaApi]);
 
   return (
-    <Section id="galeri" className="bg-sand">
+    <Section id="galeri" className="bg-cream">
       <Container>
         <SectionHeading
           eyebrow={gallery.eyebrow}
