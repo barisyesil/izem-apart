@@ -67,6 +67,7 @@ export const navLinks: NavLink[] = [
   { label: "Odalar", href: "#odalar" },
   { label: "Olanaklar", href: "#olanaklar" },
   { label: "Galeri", href: "#galeri" },
+  { label: "Konum", href: "#konum" },
   { label: "İletişim", href: "#iletisim" },
 ];
 
@@ -74,8 +75,7 @@ export const navLinks: NavLink[] = [
 // Hem her bölümün başlığındaki küçük numaraya ("02" gibi) hem de sağdaki
 // "Büyüyen İplik" rayına (ChapterRail) TEK kaynaktan besleme yapar; böylece
 // iki yerde ayrı ayrı yazılan numaralar birbirinden kopmaz. Hero "kapak"
-// sayıldığı için listede yoktur; Konum ise üst menüde yer almasa da (menü
-// kısa tutulmak istendi) burada, sayfanın gerçek akışında bir bölümdür.
+// sayıldığı için listede yoktur.
 export const chapters: { id: string; number: string; label: string }[] = [
   { id: "hakkimizda", number: "02", label: "Hakkımızda" },
   { id: "odalar", number: "03", label: "Odalar" },
