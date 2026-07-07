@@ -30,8 +30,19 @@ export default function BrandLogo({
     // içerir — bunlar metnin punto boyutunu etkilemez, bu yüzden görsel
     // hiyerarşi için "text-xl" burada AYRICA belirtiliyor (mobil menüdeki
     // "İzem" yedek metniyle aynı büyüklük, bkz. Header.tsx).
+    //
+    // RENK KASITLI OLARAK BELİRTİLMİYOR — metin, çevresinden (currentColor)
+    // miras alsın diye. Logo BEYAZ çizildiği için Header, sayfa henüz
+    // kaydırılmamışken (koyu Hero'nun üzerindeyken) KENDİ metin rengini
+    // "text-cream" (açık) yapıyor, kaydırılınca "text-ink" (koyu) oluyor —
+    // gerçek görsel de aynı mantıkla (beyaz logo + kaydırılınca brightness-0
+    // filtresi) kararıyor. Buraya sabit bir renk ("text-espresso" gibi)
+    // verilirse, Header henüz kaydırılmamışken koyu metin koyu Hero
+    // zemininde kayboluyordu — miras alma bu iki durumu da otomatik
+    // doğru çözer (Footer'da da <body>'nin "text-ink"ini miras alıp
+    // açık zeminde okunaklı kalır).
     return (
-      <span className={`font-serif text-xl text-espresso ${className}`}>
+      <span className={`font-serif text-xl ${className}`}>
         {brand.shortName}
       </span>
     );
