@@ -319,6 +319,7 @@ export const contact = {
     roomTypeOptions: ["Fark etmez", "Tek Kişilik Oda", "Çift Kişilik Oda"],
     messageLabel: "Mesajınız",
     messagePlaceholder: "İletmek istedikleriniz...",
+    nameRequiredError: "Lütfen ad soyad alanını doldurun.",
     submitWhatsapp: "WhatsApp ile Gönder",
     submitEmail: "E-posta ile Gönder",
     // Butona basılınca kısa süreliğine görünen onay metinleri.

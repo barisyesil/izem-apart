@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, Mail } from "lucide-react";
 import { WhatsappIcon } from "@/components/ui/brand-icons";
@@ -30,6 +30,21 @@ export default function ContactForm() {
   const [message, setMessage] = useState("");
   // Az önce hangi buton kullanıldı? Kısa bir onay göstermek için (2sn).
   const [justSent, setJustSent] = useState<"whatsapp" | "email" | null>(null);
+  // Ad Soyad boş gönderilmeye çalışıldı mı? (bkz. validate())
+  const [nameError, setNameError] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  // Zorunlu alanları kontrol eder. ÖNEMLİ: bu kontrol React state'ine
+  // (name) bakar, DOM'daki "required" özniteliğine DEĞİL — bu yüzden
+  // birileri tarayıcı geliştirici araçlarından "required"ı silse bile
+  // (backend olmadığı için tek savunma hattımız bu) boş form yine de
+  // gönderilemez. Geçersizse alanı odaklayıp hata mesajını gösterir.
+  const validate = () => {
+    const isValid = name.trim().length > 0;
+    setNameError(!isValid);
+    if (!isValid) nameInputRef.current?.focus();
+    return isValid;
+  };
 
   // Form alanlarını okunaklı bir mesaja dönüştür.
   const buildText = () =>
@@ -51,6 +66,7 @@ export default function ContactForm() {
   // WhatsApp'ı hazır metinle aç.
   const sendWhatsapp = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!validate()) return;
     const url = `${site.whatsappHref}?text=${encodeURIComponent(buildText())}`;
     window.open(url, "_blank", "noopener,noreferrer");
     confirmBriefly("whatsapp");
@@ -66,6 +82,17 @@ export default function ContactForm() {
   const body = encodeURIComponent(buildText());
   const mailtoHref = `${site.emailHref}?subject=${subject}&body=${body}`;
 
+  // mailto linki bir <a>, form submit'i değil — bu yüzden aynı state
+  // kontrolünü burada da ayrıca yapıp geçersizse linkin açılmasını
+  // (e.preventDefault) engelliyoruz.
+  const handleEmailClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!validate()) {
+      e.preventDefault();
+      return;
+    }
+    confirmBriefly("email");
+  };
+
   // Ortak input görünümü (tekrar yazmamak için).
   const fieldClass =
     "w-full rounded-lg border border-hairline bg-warmwhite px-4 py-3 text-ink placeholder:text-taupe/60 focus:border-sage focus:outline-none focus:ring-2 focus:ring-sage/25";
@@ -80,17 +107,34 @@ export default function ContactForm() {
         <div>
           <label htmlFor="cf-name" className={labelClass}>
             {f.nameLabel}
+            {/* Zorunlu alan işareti — asıl zorunluluk "required" özniteliği
+                ve aşağıdaki validate() ile sağlanıyor, bu sadece görsel ipucu. */}
+            <span className="text-terracotta-deep" aria-hidden="true">
+              {" "}
+              *
+            </span>
           </label>
           <input
+            ref={nameInputRef}
             id="cf-name"
             type="text"
             required
             autoComplete="name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (nameError && e.target.value.trim()) setNameError(false);
+            }}
             placeholder={f.namePlaceholder}
-            className={fieldClass}
+            aria-invalid={nameError}
+            aria-describedby={nameError ? "cf-name-error" : undefined}
+            className={`${fieldClass} ${nameError ? "border-red-400 focus:border-red-400 focus:ring-red-200" : ""}`}
           />
+          {nameError && (
+            <p id="cf-name-error" role="alert" className="mt-1.5 text-xs text-red-600">
+              {f.nameRequiredError}
+            </p>
+          )}
         </div>
 
         <div>
@@ -156,7 +200,7 @@ export default function ContactForm() {
         </button>
         <a
           href={mailtoHref}
-          onClick={() => confirmBriefly("email")}
+          onClick={handleEmailClick}
           className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-full border border-hairline px-6 text-sm font-medium text-ink transition-colors hover:border-ink hover:bg-warmwhite"
         >
           <SubmitButtonContent
