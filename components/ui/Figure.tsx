@@ -12,9 +12,15 @@ import { imageMeta } from "@/lib/image-manifest";
 //    kaydı varsa) yüklenene kadar minik bulanık bir ön izleme gösterilir
 //    (yavaş bağlantılarda boş gri kutu yerine fotoğrafın "hayaleti").
 //  - YÜKLEME HATASI TELAFİSİ: kısıtlı ağlarda (ör. Fast 3G) bir istek
-//    yarıda kesilirse aynı görsel, önbelleği atlatan bir parametreyle
-//    2 kez daha denenir; yine olmazsa zarif yer tutucuya düşülür. Böylece
-//    "fotoğraf hiç gelmedi ve boş kaldı" durumu kalıcı olamaz.
+//    yarıda kesilirse aynı görsel 2 kez daha denenir (React'e "key" değişimiyle
+//    <img>'i sıfırdan yeniden kurdurarak); yine olmazsa zarif yer tutucuya
+//    düşülür. Böylece "fotoğraf hiç gelmedi ve boş kaldı" durumu kalıcı olamaz.
+//    NOT: Yeniden denemede src'ye "?retry=N" gibi bir önbellek-atlatma sorgu
+//    eki EKLEMİYORUZ — Next.js 16'da yerel (public/) görsellerde sorgu dizesi
+//    varsayılan olarak YASAK (images.localPatterns yapılandırılmadıkça) ve
+//    böyle bir src verilirse next/image çalışma zamanında hata fırlatıp TÜM
+//    sayfayı çökertiyor (bkz. node_modules/next/dist/shared/lib/image-loader.js).
+//    Sadece "key" değişimi (aynı src ile) yeniden deneme için yeterli.
 export default function Figure({
   src,
   alt,
@@ -45,17 +51,14 @@ export default function Figure({
   }
 
   const meta = imageMeta[src];
-  // Yeniden denemede tarayıcının "başarısız oldu" önbelleğini atlatmak
-  // için URL'e zararsız bir sorgu eki konur.
-  const effectiveSrc = attempt === 0 ? src : `${src}?retry=${attempt}`;
 
   // preload ve loading aynı anda verilmemeli (Next.js dokümantasyonunun
   // uyarısı) — preload isteniyorsa loading'i hiç geçmiyoruz.
   return (
     <div className={`relative overflow-hidden ${className}`}>
       <Image
-        key={effectiveSrc}
-        src={effectiveSrc}
+        key={attempt}
+        src={src}
         alt={alt}
         fill
         sizes={sizes}

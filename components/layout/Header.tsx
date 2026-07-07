@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { Menu, Phone, X } from "lucide-react";
 import { brand, navLinks, site } from "@/lib/content";
+import BrandLogo from "@/components/ui/BrandLogo";
 import { WhatsappIcon } from "@/components/ui/brand-icons";
 import { useActiveSection } from "@/lib/useActiveSection";
 
@@ -89,11 +89,7 @@ export default function Header() {
             className="shrink-0"
             aria-label={`${brand.name} ana sayfa`}
           >
-            <Image
-              src={brand.logo}
-              alt={brand.name}
-              width={345}
-              height={198}
+            <BrandLogo
               preload
               className={`h-10 w-auto transition-[filter] duration-300 sm:h-12 ${
                 scrolled ? "brightness-0" : ""
