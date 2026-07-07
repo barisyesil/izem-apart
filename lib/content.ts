@@ -80,8 +80,8 @@ export const chapters: { id: string; number: string; label: string }[] = [
   { id: "hakkimizda", number: "02", label: "Hakkımızda" },
   { id: "odalar", number: "03", label: "Odalar" },
   { id: "olanaklar", number: "04", label: "Olanaklar" },
-  { id: "konum", number: "05", label: "Konum" },
-  { id: "galeri", number: "06", label: "Galeri" },
+  { id: "galeri", number: "05", label: "Galeri" },
+  { id: "konum", number: "06", label: "Konum" },
   { id: "iletisim", number: "07", label: "İletişim" },
 ];
 
