@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import AutoScroll from "embla-carousel-auto-scroll";
 import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
@@ -43,7 +43,7 @@ export default function Gallery() {
   const reduceMotion = useReducedMotion();
   const isFine = useFinePointer();
 
-  const [emblaRef] = useEmblaCarousel(
+  const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       loop: true,
       dragFree: true,
@@ -64,6 +64,21 @@ export default function Gallery() {
           }),
         ],
   );
+
+  // Tarayıcı yakınlaştırması (zoom) değiştirildiğinde: Embla'nın dahili
+  // ResizeObserver'ı konteyner/kart boyutlarındaki değişimi yakalayıp
+  // motoru sessizce yeniden kurar (reInit) ve bir "resize" olayı yayınlar.
+  // AutoScroll eklentisi bu olayı DİNLEMİYOR — bu yüzden zoom sonrası
+  // otomatik kayma kendini yeniden tetiklemiyor ve şerit donmuş gibi
+  // kalabiliyor. Elle dinleyip eklentiyi yeniden oynatarak bunu düzeltiyoruz.
+  useEffect(() => {
+    if (!emblaApi) return;
+    const resumeAutoScroll = () => emblaApi.plugins().autoScroll?.play();
+    emblaApi.on("resize", resumeAutoScroll);
+    return () => {
+      emblaApi.off("resize", resumeAutoScroll);
+    };
+  }, [emblaApi]);
 
   return (
     <Section id="galeri" className="bg-sand">
