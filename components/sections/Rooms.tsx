@@ -115,42 +115,32 @@ function RoomCard({
         <div ref={emblaRef} className="overflow-hidden">
           <div className="flex touch-pan-y">
             {room.gallery.map((image, photoIndex) => (
-              <div key={image.src} className="min-w-0 flex-[0_0_100%]">
-                {/* Fotoğrafın HERHANGİ bir yerine basmak Lightbox'ı doğrudan
-                    o fotoğrafta açar (ayrı bir büyütme ikonuna gerek kalmadan
-                    — mobilde daha ergonomik). Embla'nın kendi tıklama-bastırma
-                    mekanizması (bkz. node_modules/embla-carousel .../
-                    DragHandler — 'click' olayını capture aşamasında yakalayıp
-                    sürükleme sonrası tetiklenmesini engelliyor) sayesinde bu,
-                    kaydırma (swipe) ile ÇAKIŞMAZ: bir sürükleme sonrası oluşan
-                    tıklama otomatik iptal edilir. */}
-                <button
-                  type="button"
-                  onClick={() => onOpenGallery(photoIndex)}
-                  aria-label={`${room.name} fotoğrafı ${photoIndex + 1} — büyüt`}
-                  className="group relative block w-full cursor-pointer"
-                >
-                  <Figure
-                    src={image.src}
-                    alt={image.alt}
-                    label={room.name}
-                    className="aspect-[4/3] w-full"
-                    sizes="(max-width: 768px) 100vw, 560px"
-                    loading={photoIndex === 0 ? "eager" : "lazy"}
-                  />
-                  <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/0 opacity-0 transition-all duration-300 group-hover:bg-ink/20 group-hover:opacity-100">
-                    <Expand className="h-7 w-7 text-cream drop-shadow" aria-hidden="true" />
-                  </span>
-                </button>
+              <div key={image.src} className="relative min-w-0 flex-[0_0_100%]">
+                <Figure
+                  src={image.src}
+                  alt={image.alt}
+                  label={room.name}
+                  className="aspect-[4/3] w-full"
+                  sizes="(max-width: 768px) 100vw, 560px"
+                  loading={photoIndex === 0 ? "eager" : "lazy"}
+                />
               </div>
             ))}
           </div>
         </div>
 
-        {/* Fotoğraf sayacı (sol üst) */}
-        <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-ink/50 px-3 py-1.5 text-xs tabular-nums text-cream/90 backdrop-blur-sm">
+        {/* Fotoğraf sayacı (sol üst) + büyütme (sağ üst) */}
+        <span className="absolute left-3 top-3 rounded-full bg-ink/50 px-3 py-1.5 text-xs tabular-nums text-cream/90 backdrop-blur-sm">
           {selected + 1} / {room.gallery.length}
         </span>
+        <button
+          type="button"
+          onClick={() => onOpenGallery(selected)}
+          aria-label={`${room.name} fotoğrafını büyüt`}
+          className="absolute right-3 top-3 inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-ink/50 text-cream backdrop-blur-sm transition-colors hover:bg-ink/75"
+        >
+          <Expand className="h-5 w-5" aria-hidden="true" />
+        </button>
 
         {/* Oklar (sağ alt) */}
         <div className="absolute bottom-3 right-3 flex items-center gap-2">
@@ -224,15 +214,20 @@ function RoomCard({
           ))}
         </ul>
 
-        {/* Çağrı — fotoğrafları büyütme artık fotoğrafın kendisine tıklanarak
-            yapıldığı için (bkz. yukarıdaki buton), burada tek ve tam
-            genişlikte, öne çıkan bir WhatsApp çağrısı kalıyor. */}
-        <div className="mt-auto pt-8">
+        {/* Çağrılar — kart boyları farklı olsa da butonlar alta hizalanır */}
+        <div className="mt-auto flex flex-col gap-3 pt-8 sm:flex-row sm:items-center">
+          <button
+            type="button"
+            onClick={() => onOpenGallery(selected)}
+            className="inline-flex min-h-[48px] cursor-pointer items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-espresso"
+          >
+            Fotoğrafları Gör ({room.gallery.length})
+          </button>
           <a
             href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-espresso"
+            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-hairline px-6 text-sm text-ink transition-colors hover:bg-sand/60"
           >
             Bu Odayı Sor
           </a>
