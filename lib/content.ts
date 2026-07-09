@@ -15,7 +15,6 @@ import {
   BedDouble,
   Cctv,
   HeartHandshake,
-  MapPin,
   NotebookPen,
   ShieldCheck,
   ShowerHead,
@@ -101,12 +100,6 @@ export const hero = {
   // birebir fotoğrafı DEĞİL) alt metin de buna göre nötr/betimleyici —
   // spesifik bir oda iddiası içermiyor.
   imageAlt: "Sıcak tonlarda, davetkâr bir oturma alanı",
-  // CTA butonlarının altında görünen küçük güven çipleri.
-  chips: [
-    { icon: ShieldCheck, title: "24 saat güvenlik" },
-    { icon: ShowerHead, title: "7/24 sıcak su" },
-    { icon: MapPin, title: "Merkezî konum" },
-  ] as Feature[],
 };
 
 // --- Hakkımızda ---

@@ -9,27 +9,32 @@ import {
   useTransform,
   type Variants,
 } from "framer-motion";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, ArrowRight } from "lucide-react";
 import ButtonLink from "@/components/ui/ButtonLink";
 import Container from "@/components/ui/Container";
 import MagneticWrap from "@/components/ui/MagneticWrap";
 import { hero } from "@/lib/content";
 
 // =====================================================================
-// KARŞILAMA (HERO) BÖLÜMÜ — "Canlı Kapak"
+// KARŞILAMA (HERO) BÖLÜMÜ — "Kapı Aralığı"
 // ---------------------------------------------------------------------
-// Sayfanın ilk, sinematik ekranı. Arka planda gerçek, atmosferik bir iç
-// mekan fotoğrafı (hero.image) yavaşça "yerine oturarak" (zoom-settle +
-// fade-in) açılır — modern landing page hero'larındaki animasyonlu giriş
-// hissi için. Metnin okunabilirliği için yönlü bir karartma katmanı
-// vardır: sol taraf (başlık/butonlar/çipler) koyu, sağ taraf (odanın
-// mimari detayları) daha açık bırakılır. hero.image boşsa (bkz.
-// lib/content.ts) kendi çizdiğimiz "bina" çizgi-motifine (HeroMotif)
-// otomatik geri düşer. Başlık satır satır bir "perde açılma" (wipe)
-// efektiyle belirir, altında bölücü çizgilerle ayrılmış bir güven-çipi
-// sırası ve mıknatıs gibi imleci takip eden butonlar vardır.
-// "use client": animasyon ve kaydırma tarayıcıda çalışır.
-// "Hareketi azalt" açıksa: tüm animasyonlar kapanır, içerik sabit kalır.
+// Önceki sürüm içeriği DİKEY ORTALIYORDU (items-center) — bu, büyük bir
+// fotoğrafın üzerinde metnin "ortada asılı kalmış", kadrajla güçlü bir
+// ilişkisi olmayan bir izlenim veriyordu. Bu sürüm içeriği bilinçli olarak
+// EKRANIN ALTINA yaslıyor (justify-end): editoryal/awwwards tarzı
+// kompozisyonlarda başlık genelde bir kenara "oturur", ortada yüzmez.
+// Bu da metne kadrajla net, kasıtlı bir ilişki kurduruyor.
+//
+// TEK bir sahne-açılış anı: fotoğrafın önünde duran koyu bir "perde"
+// (CurtainReveal) sayfa yüklenince sola doğru kayarak açılır — sanki
+// eve giden kapı aralanıyormuş gibi. Önceki sürümdeki birbirinden
+// bağımsız 5-6 ayrı animasyon (zoom+fade, dane grenli doku, çipler
+// sırası, buton gecikmeleri...) yerine TEK, kasıtlı bir sahne kurulumu:
+// perde açılır → başlık kalkar → alt metin ve çağrı belirir. Güven
+// çipleri (24 saat güvenlik vb.) buradan kaldırıldı çünkü hemen altındaki
+// Trust bölümü bunu zaten simgeleriyle birlikte, daha ayrıntılı anlatıyor
+// — Hero'nun TEK işi artık markanın kimliğini net bir şekilde söylemek.
+// "Hareketi azalt" açıksa: perde hiç render edilmez, içerik anında görünür.
 // =====================================================================
 
 // Öğelerin yumuşakça yükselerek belirmesi. custom = gecikme (saniye).
@@ -43,8 +48,7 @@ const rise: Variants = {
 };
 
 // Başlık satırları için "perde açılma" (wipe) efekti: satır, görünmez bir
-// çerçevenin (overflow-hidden) altından yukarı doğru kayarak ortaya çıkar —
-// sade bir soluklaşmadan çok daha sinematik bir "ortaya çıkış" hissi verir.
+// çerçevenin (overflow-hidden) altından yukarı doğru kayarak ortaya çıkar.
 const wipe: Variants = {
   hidden: { y: "115%" },
   show: (delay = 0) => ({
@@ -90,17 +94,10 @@ export default function Hero() {
     <section
       ref={ref}
       id="anasayfa"
-      className="relative flex min-h-dvh items-center overflow-hidden bg-ink text-cream"
+      className="relative flex min-h-dvh flex-col justify-end overflow-hidden bg-ink text-cream"
     >
-      {/* --- Arka plan (parallax + açılışta "yerine oturan" zoom) --- */}
-      <motion.div
-        aria-hidden="true"
-        style={reduce ? undefined : { y: bgY }}
-        initial={reduce ? false : { scale: 1.14, opacity: 0 }}
-        animate={reduce ? false : { scale: 1, opacity: 1 }}
-        transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute inset-0"
-      >
+      {/* --- Arka plan (parallax) --- */}
+      <motion.div aria-hidden="true" style={reduce ? undefined : { y: bgY }} className="absolute inset-0">
         {hero.image ? (
           <Image
             src={hero.image}
@@ -120,18 +117,33 @@ export default function Hero() {
         ) : (
           <HeroMotif reduce={!!reduce} />
         )}
+
+        {/* Sahne açılışı: koyu bir "perde" fotoğrafın önünü kapatır ve
+            yüklenince sola doğru kayarak açılır (transform-origin: sol) —
+            eve açılan bir kapı aralanıyormuş hissi. Tek, GPU dostu bir
+            transform (scaleX) — layout'u hiç etkilemez. */}
+        {!reduce && (
+          <motion.div
+            aria-hidden="true"
+            initial={{ scaleX: 1 }}
+            animate={{ scaleX: 0 }}
+            transition={{ duration: 1.3, delay: 0.15, ease: [0.76, 0, 0.24, 1] }}
+            style={{ transformOrigin: "left" }}
+            className="absolute inset-0 bg-ink"
+          />
+        )}
       </motion.div>
 
-      {/* Metnin net okunması için yönlü karartma: solda (başlık/butonlar)
-          koyu, sağda (fotoğrafın mimari detayları) daha açık — fotoğraf
-          hem okunabilir hem de görünür kalsın diye. */}
+      {/* Başlığın oturduğu alt bölge için: yukarıdan hafif, aşağıdan güçlü
+          bir karartma — içerik artık ekranın ALTINDA yaşadığı için zemin
+          orada en koyu, header'ın oturduğu üstte ise en açık. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-r from-ink/92 via-ink/55 to-ink/15"
+        className="absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-ink/40 to-transparent"
       />
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/70 to-transparent"
+        className="absolute inset-x-0 bottom-0 h-[65%] bg-gradient-to-t from-ink/95 via-ink/60 to-transparent"
       />
 
       {/* İnce film greni (premium doku) */}
@@ -144,17 +156,17 @@ export default function Hero() {
         }}
       />
 
-      {/* --- İçerik --- */}
+      {/* --- İçerik (ekranın altına yaslı) --- */}
       <motion.div
         style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
         className="relative z-10 w-full"
       >
-        <Container className="py-28">
-          <div className="max-w-3xl">
+        <Container className="pb-16 sm:pb-20 lg:pb-24">
+          <div className="max-w-2xl">
             {/* Üst etiket */}
             <motion.p
               variants={rise}
-              custom={0.1}
+              custom={0.9}
               initial={reduce ? false : "hidden"}
               animate={reduce ? false : "show"}
               className="mb-5 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.28em] text-cream/70"
@@ -163,21 +175,18 @@ export default function Hero() {
               {hero.eyebrow}
             </motion.p>
 
-            {/* Başlık — satır satır "perde açılma" ile belirir. Fotoğrafın
-                üzerinde daha net ayrışsın diye ince bir gölge var. */}
-            <h1 className="font-serif text-[2.75rem] leading-[1.05] [text-shadow:0_2px_28px_rgba(0,0,0,0.4)] sm:text-6xl md:text-7xl">
+            {/* Başlık — büyük, kendinden emin bir editoryal ölçek; satır
+                satır "perde açılma" ile belirir. */}
+            <h1 className="font-serif text-[3rem] leading-[0.98] [text-shadow:0_2px_28px_rgba(0,0,0,0.4)] sm:text-[4.25rem] md:text-[5.75rem] lg:text-[6.75rem] lg:leading-[0.94]">
               {hero.titleLines.map((line, index) => (
                 // pb-[0.2em]: "perde açılma" efekti için gereken overflow-hidden,
-                // sıkı leading-[1.05] ile birleşince "y" gibi alt kuyruklu (descender)
-                // harfleri kırpıyordu. Bu alt boşluk, animasyonun kayma mesafesini
-                // (iç motion.span'ın KENDİ yüksekliğine göre hesaplanıyor) etkilemeden
-                // kırpma sınırını aşağı iter — em birimi olduğu için her ekran
-                // boyutunda (sm:text-6xl, md:text-7xl) orantılı kalır.
+                // sıkı leading ile birleşince alt kuyruklu (descender) harfleri
+                // kırpıyordu. Bu alt boşluk kırpma sınırını aşağı iter.
                 <span key={line} className="block overflow-hidden pb-[0.2em]">
                   <motion.span
                     className="block"
                     variants={wipe}
-                    custom={0.2 + index * 0.15}
+                    custom={1.0 + index * 0.12}
                     initial={reduce ? false : "hidden"}
                     animate={reduce ? false : "show"}
                   >
@@ -190,21 +199,23 @@ export default function Hero() {
             {/* Alt metin */}
             <motion.p
               variants={rise}
-              custom={0.55}
+              custom={1.4}
               initial={reduce ? false : "hidden"}
               animate={reduce ? false : "show"}
-              className="mt-6 max-w-xl text-base leading-relaxed text-cream/80 sm:text-lg"
+              className="mt-6 max-w-md text-base leading-relaxed text-cream/80 sm:text-lg"
             >
               {hero.subtitle}
             </motion.p>
 
-            {/* Çağrı butonları — masaüstünde imleci hafifçe takip eder */}
+            {/* Çağrılar — TEK öne çıkan dolu buton + yanında sade, altı
+                çizili bir metin bağlantısı. İkisi eşit ağırlıkta iki buton
+                yerine tek bir net eylem sunar, ikincisi daha sakin durur. */}
             <motion.div
               variants={rise}
-              custom={0.68}
+              custom={1.55}
               initial={reduce ? false : "hidden"}
               animate={reduce ? false : "show"}
-              className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
+              className="mt-9 flex flex-wrap items-center gap-x-8 gap-y-4"
             >
               <MagneticWrap>
                 <ButtonLink href={hero.primaryCta.href} variant="light" className="group">
@@ -215,48 +226,30 @@ export default function Hero() {
                   />
                 </ButtonLink>
               </MagneticWrap>
-              <MagneticWrap>
-                <ButtonLink href={hero.secondaryCta.href} variant="outline-light">
+              <a
+                href={hero.secondaryCta.href}
+                className="group inline-flex items-center gap-2 text-sm font-medium text-cream/85 transition-colors hover:text-cream"
+              >
+                <span className="border-b border-cream/40 pb-0.5 transition-colors group-hover:border-cream">
                   {hero.secondaryCta.label}
-                </ButtonLink>
-              </MagneticWrap>
+                </span>
+                <ArrowRight
+                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </a>
             </motion.div>
-
-            {/* Güven çipleri — ince bir üst çizgiyle ayrılmış, aralarında
-                bölücü çizgili bir "öne çıkanlar" sırası (masaüstünde). */}
-            <motion.ul
-              variants={rise}
-              custom={0.8}
-              initial={reduce ? false : "hidden"}
-              animate={reduce ? false : "show"}
-              className="mt-11 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-cream/15 pt-6"
-            >
-              {hero.chips.map((chip, index) => {
-                const Icon = chip.icon;
-                return (
-                  <li
-                    key={chip.title}
-                    className={`flex items-center gap-3 ${
-                      index > 0 ? "sm:border-l sm:border-cream/15 sm:pl-8" : ""
-                    }`}
-                  >
-                    <Icon className="h-5 w-5 text-terracotta" aria-hidden="true" />
-                    <span className="text-sm font-medium tracking-wide text-cream/90">
-                      {chip.title}
-                    </span>
-                  </li>
-                );
-              })}
-            </motion.ul>
           </div>
         </Container>
       </motion.div>
 
       {/* --- Aşağı kaydır ipucu: ince çizgi + içinde akan nokta --- */}
+      {/* İçerik artık sol altta oturduğu için ipucu sağ alt köşeye taşındı
+          — ikisi çakışıp kalabalıklaşmasın diye. */}
       <a
         href="#hakkimizda"
         aria-label="Aşağı kaydır"
-        className="absolute inset-x-0 bottom-6 z-10 mx-auto flex w-fit flex-col items-center gap-2 text-cream/60 transition-colors hover:text-cream"
+        className="absolute bottom-8 right-6 z-10 hidden flex-col items-center gap-2 text-cream/60 transition-colors hover:text-cream sm:right-8 lg:flex"
       >
         <span className="text-[10px] uppercase tracking-[0.22em]">
           {hero.scrollHint}
