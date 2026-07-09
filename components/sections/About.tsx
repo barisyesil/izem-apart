@@ -15,7 +15,11 @@ import { about, chapters } from "@/lib/content";
 // =====================================================================
 export default function About() {
   return (
-    <Section id="hakkimizda" className="bg-cream">
+    // id BİLİNÇLİ OLARAK YOK: "#hakkimizda" çapası app/page.tsx'teki
+    // görünmez nöbetçi (sentinel) öğede — bu bölüm "garaj kapısı" geçişi
+    // için sticky olduğundan, çapa/scroll-spy doğrudan buna bağlanamaz
+    // (gerekçe için page.tsx'teki nota bakın).
+    <Section className="bg-cream">
       <Container>
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Metin */}

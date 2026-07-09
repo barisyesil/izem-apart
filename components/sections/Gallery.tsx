@@ -64,6 +64,13 @@ export default function Gallery() {
       skipSnaps: true,
       align: "start",
       containScroll: false,
+      // Masaüstünde (hassas imleç) şerit fareyle SÜRÜKLENEMEZ — imlecin
+      // fotoğrafları "tutup taşıması" tıklama/tilt etkileşimleriyle çakışıp
+      // hatalı hissettiriyordu; şerit orada yalnızca kendi kendine akar.
+      // Dokunmatik ekranlarda parmakla kaydırma aynen açık. (isFine
+      // değişince embla-carousel-react seçenek değişikliğini görüp motoru
+      // kendisi yeniden kurar.)
+      watchDrag: !isFine,
     },
     reduceMotion
       ? []

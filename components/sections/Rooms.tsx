@@ -124,23 +124,34 @@ function RoomCard({
                   sizes="(max-width: 768px) 100vw, 560px"
                   loading={photoIndex === 0 ? "eager" : "lazy"}
                 />
+                {/* Fotoğrafın HERHANGİ bir yerine basmak Lightbox'ı doğrudan
+                    o fotoğrafta açar — ayrı bir "büyüt" ikonu aramaya gerek
+                    kalmadan (mobilde çok daha ergonomik). Bu, kaydırmayla
+                    (swipe) ÇAKIŞMAZ: Embla, sürükleme eşiği aşıldığında
+                    ardından gelen "click" olayını capture aşamasında kendisi
+                    iptal ediyor (bkz. node_modules/embla-carousel .../
+                    DragHandler → click/preventClick) — yani sürükleme sonrası
+                    parmak/fare kalkınca Lightbox YANLIŞLIKLA açılmaz. */}
+                <button
+                  type="button"
+                  onClick={() => onOpenGallery(photoIndex)}
+                  aria-label={`${room.name} fotoğrafı ${photoIndex + 1} — büyüt`}
+                  className="group absolute inset-0 cursor-pointer"
+                >
+                  <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/0 opacity-0 transition-all duration-300 group-hover:bg-ink/15 group-hover:opacity-100">
+                    <Expand className="h-7 w-7 text-cream drop-shadow" aria-hidden="true" />
+                  </span>
+                </button>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Fotoğraf sayacı (sol üst) + büyütme (sağ üst) */}
-        <span className="absolute left-3 top-3 rounded-full bg-ink/50 px-3 py-1.5 text-xs tabular-nums text-cream/90 backdrop-blur-sm">
+        {/* Fotoğraf sayacı (sol üst) — tıklamaları yutmasın diye
+            pointer-events-none: altındaki fotoğraf-büyütme alanı çalışsın. */}
+        <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-ink/50 px-3 py-1.5 text-xs tabular-nums text-cream/90 backdrop-blur-sm">
           {selected + 1} / {room.gallery.length}
         </span>
-        <button
-          type="button"
-          onClick={() => onOpenGallery(selected)}
-          aria-label={`${room.name} fotoğrafını büyüt`}
-          className="absolute right-3 top-3 inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-ink/50 text-cream backdrop-blur-sm transition-colors hover:bg-ink/75"
-        >
-          <Expand className="h-5 w-5" aria-hidden="true" />
-        </button>
 
         {/* Oklar (sağ alt) */}
         <div className="absolute bottom-3 right-3 flex items-center gap-2">
