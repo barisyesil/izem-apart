@@ -2,102 +2,91 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type Variants,
-} from "framer-motion";
-import { ArrowDown, ArrowRight } from "lucide-react";
-import ButtonLink from "@/components/ui/ButtonLink";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import Container from "@/components/ui/Container";
-import MagneticWrap from "@/components/ui/MagneticWrap";
+import Reveal from "@/components/ui/Reveal";
 import { hero } from "@/lib/content";
 
 // =====================================================================
-// KARŞILAMA (HERO) BÖLÜMÜ — "Kapı Aralığı"
+// KARŞILAMA (HERO) BÖLÜMÜ — "Yükselen Perde"
 // ---------------------------------------------------------------------
-// Önceki sürüm içeriği DİKEY ORTALIYORDU (items-center) — bu, büyük bir
-// fotoğrafın üzerinde metnin "ortada asılı kalmış", kadrajla güçlü bir
-// ilişkisi olmayan bir izlenim veriyordu. Bu sürüm içeriği bilinçli olarak
-// EKRANIN ALTINA yaslıyor (justify-end): editoryal/awwwards tarzı
-// kompozisyonlarda başlık genelde bir kenara "oturur", ortada yüzmez.
-// Bu da metne kadrajla net, kasıtlı bir ilişki kurduruyor.
+// Sahne efekti: Hero, kendi yüksekliğinin İKİ KATI bir kaydırma
+// alanına (wrapper, 200vh) "sabitlenmiş" (position: sticky) olarak
+// oturur. Kullanıcı aşağı kaydırdıkça Hero, ekranın üstüne YAPIŞIK
+// kalırken KENDİSİ yukarı doğru kayar (translateY 0% → -100%) — sanki
+// bir tiyatro perdesi yukarı açılıyormuş gibi Hakkımızda bölümünü
+// ortaya çıkarır. Kaydırma çift yönlü olduğu için yukarı kaydırınca
+// bu doğal olarak TERSİNE döner (perde tekrar iner). Bu tek, kasıtlı
+// "sahne" hareketi haricinde Hero'da başka bir yüklenme animasyonu
+// yok — içerik (Reveal ile) sade bir şekilde belirir.
 //
-// TEK bir sahne-açılış anı: fotoğrafın önünde duran koyu bir "perde"
-// (CurtainReveal) sayfa yüklenince sola doğru kayarak açılır — sanki
-// eve giden kapı aralanıyormuş gibi. Önceki sürümdeki birbirinden
-// bağımsız 5-6 ayrı animasyon (zoom+fade, dane grenli doku, çipler
-// sırası, buton gecikmeleri...) yerine TEK, kasıtlı bir sahne kurulumu:
-// perde açılır → başlık kalkar → alt metin ve çağrı belirir. Güven
-// çipleri (24 saat güvenlik vb.) buradan kaldırıldı çünkü hemen altındaki
-// Trust bölümü bunu zaten simgeleriyle birlikte, daha ayrıntılı anlatıyor
-// — Hero'nun TEK işi artık markanın kimliğini net bir şekilde söylemek.
-// "Hareketi azalt" açıksa: perde hiç render edilmez, içerik anında görünür.
+// NEDEN 200vh'lik bir sarmalayıcı gerekiyor: "position: sticky" bir
+// öğenin "yapışık" kalabilmesi için kendi kapsayıcısının ondan DAHA
+// UZUN olması gerekir — kapsayıcı tam olarak öğeyle aynı yükseklikte
+// olsaydı yapışacak hiç "fazladan" kaydırma mesafesi olmazdı.
+//
+// "Hareketi azalt" açıksa: bu sahne efekti TAMAMEN devre dışı kalır
+// (sarmalayıcı da, sticky/transform da render edilmez) — Hero sade,
+// tek ekranlık, hareketsiz bir bölüm olarak görünür.
 // =====================================================================
-
-// Öğelerin yumuşakça yükselerek belirmesi. custom = gecikme (saniye).
-const rise: Variants = {
-  hidden: { opacity: 0, y: 22 },
-  show: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
-
-// Başlık satırları için "perde açılma" (wipe) efekti: satır, görünmez bir
-// çerçevenin (overflow-hidden) altından yukarı doğru kayarak ortaya çıkar.
-const wipe: Variants = {
-  hidden: { y: "115%" },
-  show: (delay = 0) => ({
-    y: "0%",
-    transition: { duration: 0.85, delay, ease: [0.16, 1, 0.3, 1] },
-  }),
-};
-
-// HeroMotif'teki 12 pencere (4 satır x 3 sütun) için sabit titreşim
-// değerleri — sırayla değil, dağınık/organik hissettiren ama sabit
-// (Math.random() DEĞİL — sunucu/tarayıcı ilk render'da aynı sonucu
-// üretmeli, hydration uyumsuzluğu olmasın diye) gecikme/süre/duraklama.
-const WINDOW_GLOW = [
-  { delay: 0.4, duration: 2.6, pause: 3.5, peak: 0.55 },
-  { delay: 2.1, duration: 3.2, pause: 5.0, peak: 0.4 },
-  { delay: 4.6, duration: 2.2, pause: 2.8, peak: 0.6 },
-  { delay: 1.2, duration: 3.6, pause: 4.2, peak: 0.45 },
-  { delay: 5.4, duration: 2.4, pause: 3.0, peak: 0.5 },
-  { delay: 0.8, duration: 3.0, pause: 6.0, peak: 0.55 },
-  { delay: 3.6, duration: 2.8, pause: 3.6, peak: 0.4 },
-  { delay: 2.8, duration: 2.2, pause: 4.8, peak: 0.6 },
-  { delay: 6.2, duration: 3.4, pause: 2.6, peak: 0.5 },
-  { delay: 1.6, duration: 2.6, pause: 5.4, peak: 0.45 },
-  { delay: 4.0, duration: 3.2, pause: 3.2, peak: 0.55 },
-  { delay: 3.0, duration: 2.4, pause: 4.4, peak: 0.4 },
-];
 
 export default function Hero() {
   const reduce = useReducedMotion();
-  const ref = useRef<HTMLElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Bölüm ekrandan yukarı kaydıkça 0 → 1 arası ilerler.
+  // NOT: offset ["start start", "end end"] KASITLI — bu, ilerlemenin (0→1)
+  // tam olarak "position: sticky"nin doğal bırakma aralığıyla (wrapperHeight
+  // - viewportHeight) örtüşmesini sağlıyor. ["start start","end start"]
+  // kullanılsaydı ilerleme tam wrapperHeight'a kadar sürerdi ama sticky çok
+  // daha erken (yarısında) kendiliğinden çözülüp normal kaymaya geçerdi —
+  // bu da transform + doğal kayma üst üste binip Hero'nun olması gerekenden
+  // çok daha erken (ve fazla) ekran dışına çıkmasına yol açıyordu.
   const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
+    target: wrapperRef,
+    offset: ["start start", "end end"],
   });
-  // Arka plan biraz daha yavaş kayar (derinlik hissi); içerik hafifçe solar.
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
+  const curtainY = useTransform(scrollYProgress, [0, 1], ["0%", "-100%"]);
+
+  if (reduce) {
+    return (
+      <section id="anasayfa" className="relative flex h-dvh flex-col justify-end overflow-hidden bg-ink text-cream">
+        <HeroScene />
+      </section>
+    );
+  }
 
   return (
-    <section
-      ref={ref}
-      id="anasayfa"
-      className="relative flex min-h-dvh flex-col justify-end overflow-hidden bg-ink text-cream"
+    // NOT: marginBottom: "-100dvh" KASITLI. Sticky çözüldükten sonra Hero
+    // kendi 100dvh'lik doğal kutusunu sarmalayıcının GERİ KALAN kısmında
+    // (son 100dvh'lik dilimde) dolduruyor — yani bu dilim, ekranda GÖRÜNEN
+    // hiçbir şeyin olmadığı "boş" bir kaydırma aralığı. Negatif kenar
+    // boşluğu, bir sonraki bölümü (Hakkımızda) tam o boşluğun başladığı
+    // yere çekerek bu boş kaydırmayı ortadan kaldırıyor — perde tam
+    // kalktığı anda bir sonraki bölüm hemen ardından geliyor.
+    <div
+      ref={wrapperRef}
+      className="relative"
+      style={{ height: "200dvh", marginBottom: "-100dvh" }}
     >
-      {/* --- Arka plan (parallax) --- */}
-      <motion.div aria-hidden="true" style={reduce ? undefined : { y: bgY }} className="absolute inset-0">
+      <motion.section
+        id="anasayfa"
+        style={{ y: curtainY }}
+        className="sticky top-0 z-10 flex h-dvh flex-col justify-end overflow-hidden bg-ink text-cream"
+      >
+        <HeroScene />
+      </motion.section>
+    </div>
+  );
+}
+
+// Fotoğraf/motif + karartma katmanları + içerik — hem sade (hareket
+// azaltılmış) hem de sahne-efektli sürümde AYNI görsel içerik.
+function HeroScene() {
+  return (
+    <>
+      {/* --- Arka plan --- */}
+      <div aria-hidden="true" className="absolute inset-0">
         {hero.image ? (
           <Image
             src={hero.image}
@@ -115,158 +104,94 @@ export default function Hero() {
             className="animate-hero-pan object-cover object-[30%_38%]"
           />
         ) : (
-          <HeroMotif reduce={!!reduce} />
+          <HeroMotif />
         )}
+      </div>
 
-        {/* Sahne açılışı: koyu bir "perde" fotoğrafın önünü kapatır ve
-            yüklenince sola doğru kayarak açılır (transform-origin: sol) —
-            eve açılan bir kapı aralanıyormuş hissi. Tek, GPU dostu bir
-            transform (scaleX) — layout'u hiç etkilemez. */}
-        {!reduce && (
-          <motion.div
-            aria-hidden="true"
-            initial={{ scaleX: 1 }}
-            animate={{ scaleX: 0 }}
-            transition={{ duration: 1.3, delay: 0.15, ease: [0.76, 0, 0.24, 1] }}
-            style={{ transformOrigin: "left" }}
-            className="absolute inset-0 bg-ink"
-          />
-        )}
-      </motion.div>
-
-      {/* Başlığın oturduğu alt bölge için: yukarıdan hafif, aşağıdan güçlü
-          bir karartma — içerik artık ekranın ALTINDA yaşadığı için zemin
-          orada en koyu, header'ın oturduğu üstte ise en açık. */}
+      {/* İçeriğin oturduğu alt bölge için: yukarıdan hafif, aşağıdan güçlü
+          bir karartma — header'ın oturduğu üstte en açık, metnin okunduğu
+          altta en koyu. */}
       <div
         aria-hidden="true"
         className="absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-ink/40 to-transparent"
       />
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-[65%] bg-gradient-to-t from-ink/95 via-ink/60 to-transparent"
+        className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-ink/95 via-ink/55 to-transparent"
       />
 
-      {/* İnce film greni (premium doku) */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-soft-light"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-        }}
-      />
-
-      {/* --- İçerik (ekranın altına yaslı) --- */}
-      <motion.div
-        style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
-        className="relative z-10 w-full"
-      >
-        <Container className="pb-16 sm:pb-20 lg:pb-24">
+      {/* --- İçerik — ekranın alt-orta bölgesine yaslı, üstünde ve
+          altında nefes alacak boşluk bırakılarak (ne tam ortada asılı,
+          ne de alt kenara yapışık). --- */}
+      <div className="relative z-10 w-full pb-24 sm:pb-32 lg:pb-40">
+        <Container>
           <div className="max-w-2xl">
-            {/* Üst etiket */}
-            <motion.p
-              variants={rise}
-              custom={0.9}
-              initial={reduce ? false : "hidden"}
-              animate={reduce ? false : "show"}
-              className="mb-5 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.28em] text-cream/70"
-            >
-              <span className="h-px w-8 bg-terracotta/70" />
-              {hero.eyebrow}
-            </motion.p>
+            <Reveal delay={0.05}>
+              <p className="mb-5 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.28em] text-cream/70">
+                <span className="h-px w-8 bg-terracotta/70" />
+                {hero.eyebrow}
+              </p>
+            </Reveal>
 
-            {/* Başlık — büyük, kendinden emin bir editoryal ölçek; satır
-                satır "perde açılma" ile belirir. */}
-            <h1 className="font-serif text-[3rem] leading-[0.98] [text-shadow:0_2px_28px_rgba(0,0,0,0.4)] sm:text-[4.25rem] md:text-[5.75rem] lg:text-[6.75rem] lg:leading-[0.94]">
-              {hero.titleLines.map((line, index) => (
-                // pb-[0.2em]: "perde açılma" efekti için gereken overflow-hidden,
-                // sıkı leading ile birleşince alt kuyruklu (descender) harfleri
-                // kırpıyordu. Bu alt boşluk kırpma sınırını aşağı iter.
-                <span key={line} className="block overflow-hidden pb-[0.2em]">
-                  <motion.span
-                    className="block"
-                    variants={wipe}
-                    custom={1.0 + index * 0.12}
-                    initial={reduce ? false : "hidden"}
-                    animate={reduce ? false : "show"}
-                  >
+            <Reveal delay={0.15}>
+              <h1 className="font-serif text-4xl leading-[1.08] text-cream [text-shadow:0_2px_28px_rgba(0,0,0,0.4)] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+                {hero.titleLines.map((line) => (
+                  <span key={line} className="block">
                     {line}
-                  </motion.span>
-                </span>
-              ))}
-            </h1>
+                  </span>
+                ))}
+              </h1>
+            </Reveal>
 
-            {/* Alt metin */}
-            <motion.p
-              variants={rise}
-              custom={1.4}
-              initial={reduce ? false : "hidden"}
-              animate={reduce ? false : "show"}
-              className="mt-6 max-w-md text-base leading-relaxed text-cream/80 sm:text-lg"
-            >
-              {hero.subtitle}
-            </motion.p>
+            <Reveal delay={0.28}>
+              <p className="mt-6 max-w-md text-base leading-relaxed text-cream/80 sm:text-lg">
+                {hero.subtitle}
+              </p>
+            </Reveal>
 
-            {/* Çağrılar — TEK öne çıkan dolu buton + yanında sade, altı
-                çizili bir metin bağlantısı. İkisi eşit ağırlıkta iki buton
-                yerine tek bir net eylem sunar, ikincisi daha sakin durur. */}
-            <motion.div
-              variants={rise}
-              custom={1.55}
-              initial={reduce ? false : "hidden"}
-              animate={reduce ? false : "show"}
-              className="mt-9 flex flex-wrap items-center gap-x-8 gap-y-4"
-            >
-              <MagneticWrap>
-                <ButtonLink href={hero.primaryCta.href} variant="light" className="group">
+            {/* Tek, bitişik bir "kapsül" içinde iki eylem: solda öne çıkan
+                dolu yarı, sağda ince bir çizgiyle ayrılmış sakin yarı —
+                iki ayrı, eşit ağırlıkta buton yerine tek bir bütün kontrol. */}
+            <Reveal delay={0.4} className="mt-9 inline-block">
+              <div className="inline-flex overflow-hidden rounded-full border border-cream/25">
+                <a
+                  href={hero.primaryCta.href}
+                  className="inline-flex min-h-[48px] items-center gap-2 bg-cream px-5 text-sm font-medium text-ink transition-colors hover:bg-warmwhite sm:px-7"
+                >
                   {hero.primaryCta.label}
-                  <ArrowDown
-                    className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5"
+                </a>
+                <a
+                  href={hero.secondaryCta.href}
+                  className="group inline-flex min-h-[48px] items-center gap-2 border-l border-cream/25 px-5 text-sm font-medium text-cream transition-colors hover:bg-cream/10 sm:px-7"
+                >
+                  {hero.secondaryCta.label}
+                  <ArrowRight
+                    className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
                     aria-hidden="true"
                   />
-                </ButtonLink>
-              </MagneticWrap>
-              <a
-                href={hero.secondaryCta.href}
-                className="group inline-flex items-center gap-2 text-sm font-medium text-cream/85 transition-colors hover:text-cream"
-              >
-                <span className="border-b border-cream/40 pb-0.5 transition-colors group-hover:border-cream">
-                  {hero.secondaryCta.label}
-                </span>
-                <ArrowRight
-                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                />
-              </a>
-            </motion.div>
+                </a>
+              </div>
+            </Reveal>
           </div>
         </Container>
-      </motion.div>
+      </div>
 
-      {/* --- Aşağı kaydır ipucu: ince çizgi + içinde akan nokta --- */}
-      {/* İçerik artık sol altta oturduğu için ipucu sağ alt köşeye taşındı
-          — ikisi çakışıp kalabalıklaşmasın diye. */}
+      {/* --- Aşağı kaydır ipucu --- */}
       <a
         href="#hakkimizda"
         aria-label="Aşağı kaydır"
         className="absolute bottom-8 right-6 z-10 hidden flex-col items-center gap-2 text-cream/60 transition-colors hover:text-cream sm:right-8 lg:flex"
       >
-        <span className="text-[10px] uppercase tracking-[0.22em]">
-          {hero.scrollHint}
-        </span>
+        <span className="text-[10px] uppercase tracking-[0.22em]">{hero.scrollHint}</span>
         <span className="relative block h-10 w-px overflow-hidden bg-cream/20">
           <motion.span
             className="absolute left-0 top-0 block h-4 w-px bg-cream/80"
-            animate={reduce ? undefined : { y: ["-120%", "260%"] }}
-            transition={
-              reduce
-                ? undefined
-                : { duration: 1.9, repeat: Infinity, ease: "easeInOut" }
-            }
+            animate={{ y: ["-120%", "260%"] }}
+            transition={{ duration: 1.9, repeat: Infinity, ease: "easeInOut" }}
           />
         </span>
       </a>
-    </section>
+    </>
   );
 }
 
@@ -278,10 +203,26 @@ export default function Hero() {
 // gibi "kendini çizer" (pathLength 0 → 1), gerçek apartın pencere
 // ritmine gevşek şekilde gönderme yapar. Tamamen dekoratif (aria-hidden).
 // =====================================================================
-function HeroMotif({ reduce }: { reduce: boolean }) {
+const WINDOW_GLOW = [
+  { delay: 0.4, duration: 2.6, pause: 3.5, peak: 0.55 },
+  { delay: 2.1, duration: 3.2, pause: 5.0, peak: 0.4 },
+  { delay: 4.6, duration: 2.2, pause: 2.8, peak: 0.6 },
+  { delay: 1.2, duration: 3.6, pause: 4.2, peak: 0.45 },
+  { delay: 5.4, duration: 2.4, pause: 3.0, peak: 0.5 },
+  { delay: 0.8, duration: 3.0, pause: 6.0, peak: 0.55 },
+  { delay: 3.6, duration: 2.8, pause: 3.6, peak: 0.4 },
+  { delay: 2.8, duration: 2.2, pause: 4.8, peak: 0.6 },
+  { delay: 6.2, duration: 3.4, pause: 2.6, peak: 0.5 },
+  { delay: 1.6, duration: 2.6, pause: 5.4, peak: 0.45 },
+  { delay: 4.0, duration: 3.2, pause: 3.2, peak: 0.55 },
+  { delay: 3.0, duration: 2.4, pause: 4.4, peak: 0.4 },
+];
+
+function HeroMotif() {
   // 3 sütun x 4 satırlık pencere ızgarası için koordinatlar.
   const windowCols = [44, 92, 140];
   const windowRows = [44, 98, 152, 206];
+  const reduce = useReducedMotion();
 
   return (
     <div className="absolute -right-[8%] bottom-[-8%] w-[78vw] max-w-[420px] text-brass opacity-[0.16] sm:max-w-[480px]">
