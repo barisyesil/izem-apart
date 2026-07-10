@@ -54,7 +54,12 @@ export default function About() {
                 alt={about.imageAlt}
                 label="Apart'tan bir kare"
                 className="aspect-[4/5] w-full rounded-2xl"
-                sizes="(max-width: 1024px) 90vw, 45vw"
+                // Masaüstünde 2 sütunlu grid (lg:grid-cols-2, gap-16) →
+                // görsel sütunu max-w-6xl konteynerde en fazla ~512px olur;
+                // "45vw" geniş ekranlarda bunu aşıp gereksiz büyük kaynak
+                // seçtiriyordu. Sabit 512px daha isabetli. Altında tek sütun,
+                // konteyner iç boşluğu düşülünce ~%90vw.
+                sizes="(min-width: 1024px) 512px, 90vw"
               />
             </Parallax>
           </Reveal>

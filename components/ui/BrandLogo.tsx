@@ -60,8 +60,17 @@ export default function BrandLogo({
       key={attempt}
       src={brand.logo}
       alt={brand.name}
-      width={345}
-      height={198}
+      // Gerçek dosya 345×198 ama ekranda ~84×48px (h-10/h-12 w-auto)
+      // gösteriliyor. next/image, ÇÖZÜNÜRLÜK adaylarını (srcset 1x/2x)
+      // bu width/height'a göre üretir — ham dosya boyutunu vermek,
+      // yüksek-DPR ekranlarda bile gereğinden çok büyük bir kaynak
+      // indirtiyordu (PSI: "Resim yayınlamayı kolaylaştırın", w=750
+      // servis ediliyordu). Aynı en-boy oranını (345:198) koruyan,
+      // gerçek görünür boyuta yakın bir çift, CSS'in belirlediği nihai
+      // kutuyu (w-auto) DEĞİŞTİRMEDEN çok daha küçük ve yine keskin
+      // (2x ≈ 230px) bir kaynak seçilmesini sağlar.
+      width={115}
+      height={66}
       onError={() => setAttempt((n) => n + 1)}
       className={className}
       {...(preload ? { preload: true } : {})}
