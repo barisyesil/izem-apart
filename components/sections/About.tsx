@@ -60,6 +60,20 @@ export default function About() {
                 // seçtiriyordu. Sabit 512px daha isabetli. Altında tek sütun,
                 // konteyner iç boşluğu düşülünce ~%90vw.
                 sizes="(min-width: 1024px) 512px, 90vw"
+                // ÖNEMLİ — bu görsel görünüşte "ikinci bölüm, kaydırınca
+                // gelir" olsa da, app/page.tsx'teki "garaj kapısı" hilesi
+                // (-mt-[100dvh] + sticky) bu bölümü Hero'nun TAM ARKASINDA,
+                // aynı ilk ekran alanında tutuyor. Tarayıcının LCP algoritması
+                // z-index'e göre görsel örtülmeyi HESABA KATMAZ (sadece
+                // opacity/visibility/DOM'da olup olmadığına bakar) — yani bu
+                // görsel, kullanıcı hiç görmese bile gerçek bir LCP adayı.
+                // loading="lazy" (varsayılan) yüzünden düşük öncelikle
+                // indiriliyordu; yavaş mobilde bu, ölçülen LCP'yi ~7,9 sn'ye
+                // itiyordu (PSI: "loading=lazy kullanılmamalı" + "fetchpriority
+                // =high uygulanmalı"). eager + fetchPriority="high" ile Hero'nun
+                // kendi görseliyle AYNI kritik dalgada, erken indirilir.
+                loading="eager"
+                fetchPriority="high"
               />
             </Parallax>
           </Reveal>

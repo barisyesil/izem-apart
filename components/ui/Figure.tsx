@@ -29,6 +29,7 @@ export default function Figure({
   sizes = "(max-width: 768px) 100vw, 50vw",
   preload = false,
   loading = "lazy",
+  fetchPriority,
 }: {
   src: string;
   alt: string;
@@ -41,6 +42,12 @@ export default function Figure({
   // gereken (örn. sürekli kayan galeri şeridi) görseller için loading="eager".
   preload?: boolean;
   loading?: "lazy" | "eager";
+  // ÖNEMLİ: next/image "preload"/"priority" prop'undan fetchPriority'yi
+  // OTOMATİK TÜRETMEZ (bkz. node_modules/next/dist/shared/lib/get-img-props.js
+  // — fetchPriority salt bir passthrough, sadece açıkça verilirse <img>'e
+  // ve <link rel="preload">'a yazılır). Yani bir görseli gerçekten yüksek
+  // öncelikli indirtmek için bu prop'u AYRICA vermek gerekir.
+  fetchPriority?: "high" | "low" | "auto";
 }) {
   // Kaçıncı denemedeyiz? 0 = ilk deneme. Sınıra ulaşınca pes edilir.
   const [attempt, setAttempt] = useState(0);
@@ -68,6 +75,7 @@ export default function Figure({
           ? { placeholder: "blur" as const, blurDataURL: meta.blurDataURL }
           : {})}
         {...(preload ? { preload: true } : { loading })}
+        {...(fetchPriority ? { fetchPriority } : {})}
       />
     </div>
   );

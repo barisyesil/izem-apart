@@ -27,6 +27,11 @@ export default function Hero() {
             alt={hero.imageAlt}
             fill
             preload
+            // "preload" next/image'a <link rel="preload"> ekletir ama
+            // fetchPriority'yi OTOMATİK türetmez (next/image kaynağında
+            // ikisi bağımsız prop'lar) — sayfanın en kritik görseli için
+            // bunu açıkça de belirtiyoruz.
+            fetchPriority="high"
             sizes="100vw"
             className="animate-hero-pan object-cover object-[30%_38%]"
             {...(imageMeta[hero.image]
