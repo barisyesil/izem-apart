@@ -4,17 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { brand } from "@/lib/content";
 
-// Marka logosu — Header VE Footer'da kullanılan, iç-boyutlu (width/height
-// verilen, Figure.tsx'in aksine "fill" OLMAYAN) tek görsel.
-//
-// NEDEN AYRI BİR BİLEŞEN: logo daha önce her iki yerde de ÇIPLAK next/image
-// ile gösteriliyordu — Figure.tsx'e (galeri/oda fotoğrafları için) eklediğimiz
-// "yüklenemezse birkaç kez yeniden dene, sonra zarif bir yedeğe düş"
-// telafisi buraya hiç uygulanmamıştı. Logo HER sayfada göründüğü için, bir
-// ziyaretçinin oturumunda tek seferlik bir ağ hatası bile logonun kalıcı
-// olarak boş kalmasına yol açabiliyordu. Bu bileşen Figure'daki AYNI deseni
-// (cache atlatan yeniden deneme) uygular; son çare olarak da tamamen boş
-// kalmak yerine marka adını yazıyla gösterir.
 export default function BrandLogo({
   className = "",
   preload = false,
@@ -69,8 +58,8 @@ export default function BrandLogo({
       // gerçek görünür boyuta yakın bir çift, CSS'in belirlediği nihai
       // kutuyu (w-auto) DEĞİŞTİRMEDEN çok daha küçük ve yine keskin
       // (2x ≈ 230px) bir kaynak seçilmesini sağlar.
-      width={115}
-      height={66}
+      width={70}
+      height={40}
       onError={() => setAttempt((n) => n + 1)}
       className={className}
       {...(preload ? { preload: true } : {})}

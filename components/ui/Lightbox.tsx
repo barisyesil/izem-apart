@@ -135,8 +135,14 @@ export default function Lightbox({
               onDragEnd={dragEnabled ? handleDragEnd : undefined}
               className="absolute inset-0"
             >
-              <Figure src={active.src} alt={active.alt} label="Foto" className="h-full w-full" sizes="100vw" />
-            </motion.div>
+              <Figure 
+              src={active.src} 
+              alt={active.alt} 
+              label="Foto" 
+              className="h-full w-full" 
+              sizes="(max-width: 768px) 100vw, 768px" 
+            />     
+           </motion.div>
           </AnimatePresence>
         </div>
 
