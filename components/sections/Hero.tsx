@@ -4,8 +4,8 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Container from "@/components/ui/Container";
-import Reveal from "@/components/ui/Reveal";
 import { hero } from "@/lib/content";
+import { imageMeta } from "@/lib/image-manifest";
 
 // =====================================================================
 // KARŞILAMA (HERO) BÖLÜMÜ — "Garaj Kapısı"
@@ -29,6 +29,12 @@ export default function Hero() {
             preload
             sizes="100vw"
             className="animate-hero-pan object-cover object-[30%_38%]"
+            {...(imageMeta[hero.image]
+              ? {
+                  placeholder: "blur" as const,
+                  blurDataURL: imageMeta[hero.image].blurDataURL,
+                }
+              : {})}
           />
         )}
       </div>
@@ -57,14 +63,18 @@ export default function Hero() {
         <Container>
           {/* Sola yaklaştırıldı ve max-w genişletildi */}
           <div className="max-w-2xl md:ml-4 lg:ml-8">
-            <Reveal delay={0.05}>
+            {/* NOT: Kademeli belirme artık SALT CSS (.animate-rise-in +
+                --rise-delay, bkz. globals.css) — içerik JS/hydrate
+                beklemeden ilk boyanır, LCP FCP'ye yakına iner. Önceki
+                <Reveal> (Framer Motion) sarmalayıcıları kaldırıldı. */}
+            <div className="animate-rise-in [--rise-delay:0.05s]">
               <p className="mb-5 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.28em] text-cream/70 sm:text-sm">
                 <span className="h-px w-8 bg-terracotta/70" />
                 {hero.eyebrow}
               </p>
-            </Reveal>
+            </div>
 
-            <Reveal delay={0.15}>
+            <div className="animate-rise-in [--rise-delay:0.15s]">
               {/* Boyutlar bir tık büyütüldü */}
               <h1 className="font-serif text-4xl leading-[1.08] text-cream [text-shadow:0_2px_28px_rgba(0,0,0,0.4)] sm:text-5xl md:text-6xl lg:text-7xl">
                 {hero.titleLines.map((line) => (
@@ -73,16 +83,16 @@ export default function Hero() {
                   </span>
                 ))}
               </h1>
-            </Reveal>
+            </div>
 
-            <Reveal delay={0.28}>
-              {/* Alt metin biraz daha okunaklı yapıldı */}
+            <div className="animate-rise-in [--rise-delay:0.28s]">
+              {/* Alt metin biraz daha okunaklı yapıldı (sayfanın LCP elemanı) */}
               <p className="mt-6 max-w-md text-base leading-relaxed text-cream/80 sm:text-lg">
                 {hero.subtitle}
               </p>
-            </Reveal>
+            </div>
 
-            <Reveal delay={0.4} className="mt-9 inline-block">
+            <div className="animate-rise-in mt-9 inline-block [--rise-delay:0.4s]">
               {/* Butonlar eski doyurucu boyutuna (48px) geri getirildi */}
               <div className="inline-flex overflow-hidden rounded-full border border-cream/25">
                 <a
@@ -102,7 +112,7 @@ export default function Hero() {
                   />
                 </a>
               </div>
-            </Reveal>
+            </div>
           </div>
         </Container>
       </div>

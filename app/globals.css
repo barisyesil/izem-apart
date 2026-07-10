@@ -117,6 +117,40 @@ body {
   }
 }
 
+/* =====================================================================
+   GİRİŞ BELİRME (rise-in) — SADECE CSS
+   ---------------------------------------------------------------------
+   Hero içeriğinin (eyebrow / başlık / alt metin / CTA) yumuşakça
+   aşağıdan yukarı + saydamlıkla belirmesi. Daha önce bu, Framer Motion
+   tabanlı <Reveal> ile yapılıyordu; ama Reveal içeriği JS paketi inip
+   HYDRATE olana kadar opacity:0 tutuyordu. Hero'nun alt paragrafı
+   sayfanın LCP (Largest Contentful Paint) elemanı olduğu için, bu
+   yavaş 4G'de LCP'yi ~8 sn'ye itiyordu (JS'in gelmesini bekliyordu).
+   Aynı görünümü SALT CSS ile yaparak içerik artık ilk SSR HTML'inde,
+   JS olmadan boyanır → LCP, FCP'ye çok yakına iner.
+
+   KISIT: opacity:0 ASLA statik/başlangıç stili olarak verilmez —
+   yalnızca keyframe'in `from` adımında yaşar ve `both` doldurma
+   moduyla uygulanır. Böylece bu sınıf hiç etki etmezse (ör. CSS
+   animasyonu desteklenmiyorsa) içerik varsayılan olarak GÖRÜNÜR kalır.
+   Gecikme (--rise-delay) ile orijinal kademeli (stagger) sıralama
+   korunur: eyebrow 0.05s, başlık 0.15s, alt metin 0.28s, CTA 0.4s. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise-in {
+  animation: rise-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--rise-delay, 0s)
+    both;
+}
+
 /* Klavye ile gezinenler için net odak halkası (erişilebilirlik) */
 :focus-visible {
   outline: 2px solid var(--color-sage-deep);
@@ -139,5 +173,13 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+  /* rise-in özel bir durum: yukarıdaki genel kural animation-duration'ı
+     sıfırlıyor ama animation-DELAY'i ezmiyor. `both` doldurma modu +
+     gecikme birleşince, içerik gecikme boyunca opacity:0 (görünmez)
+     kalırdı. Animasyonu tamamen kapatarak öğenin varsayılan (görünür)
+     stiliyle anında boyanmasını garanti ediyoruz. */
+  .animate-rise-in {
+    animation: none !important;
   }
 }
