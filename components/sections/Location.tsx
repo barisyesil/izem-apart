@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ArrowUpRight, Bus, Footprints, MapPin } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import ButtonLink from "@/components/ui/ButtonLink";
@@ -38,6 +39,33 @@ export default function Location() {
   const query = encodeURIComponent(site.address);
   const mapEmbed = `https://www.google.com/maps?q=${query}&z=15&output=embed`;
   const mapLink = `https://www.google.com/maps/search/?api=1&query=${query}`;
+
+  // Google Maps iframe'i ~400 KiB'lik ağır bir üçüncü-taraf JS zinciri
+  // getiriyor. Sayfa açılışının KRİTİK ilk saniyelerinde (hero boyanırken)
+  // bunu yüklemek bant genişliğini yiyor ve LCP'yi geciktiriyordu. Yine de
+  // "kullanıcı Konum'a inince harita hazır olsun" amacını korumak için,
+  // haritayı sayfanın kendi kaynakları yüklendikten HEMEN SONRA (load
+  // event) monte ediyoruz — kritik pencerenin dışında ama görünürlüğe
+  // ihtiyaç duymadan, erken. Bir güvenlik ağı olarak ~3,5 sn'lik zamanlayıcı
+  // da var (hangisi önce gelirse). Böylece harita ne açılışı yavaşlatır ne
+  // de kullanıcı hızlıca kaydırınca boş/geç görünür.
+  const [showMap, setShowMap] = useState(false);
+  useEffect(() => {
+    if (showMap) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const mount = () => setShowMap(true);
+    if (document.readyState === "complete") {
+      // Sayfa zaten yüklüyse bir sonraki boş karede monte et.
+      timer = setTimeout(mount, 0);
+    } else {
+      window.addEventListener("load", mount, { once: true });
+      timer = setTimeout(mount, 3500); // güvenlik ağı
+    }
+    return () => {
+      window.removeEventListener("load", mount);
+      if (timer) clearTimeout(timer);
+    };
+  }, [showMap]);
 
   return (
     <Section id="konum" className="bg-sand">
@@ -86,20 +114,22 @@ export default function Location() {
         </div>
 
         {/* Gerçek harita — tam genişlikte, şemanın altında.
-            loading="lazy" KASITLI OLARAK kullanılmıyor: harita en son
-            bölümlerden birinde olduğu için tarayıcının tembel-yükleme
-            sezgisi sayfaya girildiğinde onu geç fark ediyor, kullanıcı
-            hızlıca kaydırınca boş/yüklenmemiş görünüyordu. Bunun yerine
-            sayfa açılır açılmaz arka planda gömülmeye başlasın diye
-            eager (varsayılan) davranış bırakılıyor. */}
+            Iframe, sayfa yüklendikten SONRA monte ediliyor (yukarıdaki
+            showMap mantığı) — böylece açılışın kritik penceresinde LCP'yi
+            geciktirmez ama kullanıcı buraya inmeden çoktan hazır olur.
+            Yükseklik (h-[320px] sm:h-[380px]) SARMALAYICI div'e verildi ki
+            iframe monte olmadan önce de aynı alan ayrılsın → düzen kayması
+            (CLS) olmaz; monte edilene kadar hafif bir yer tutucu görünür. */}
         <Reveal delay={0.15} className="mt-10">
-          <div className="overflow-hidden rounded-2xl border border-hairline">
-            <iframe
-              src={mapEmbed}
-              title="İzem Bayan Apart konum haritası"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="h-[320px] w-full sm:h-[380px]"
-            />
+          <div className="relative h-[320px] overflow-hidden rounded-2xl border border-hairline bg-sand sm:h-[380px]">
+            {showMap && (
+              <iframe
+                src={mapEmbed}
+                title="İzem Bayan Apart konum haritası"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="absolute inset-0 h-full w-full"
+              />
+            )}
           </div>
         </Reveal>
       </Container>
