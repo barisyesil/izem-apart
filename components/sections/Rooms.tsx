@@ -6,7 +6,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Expand } from "lucide-react";
 import Container from "@/components/ui/Container";
 import Figure from "@/components/ui/Figure";
-import Lightbox from "@/components/ui/Lightbox";
+import Lightbox from "@/components/ui/LightboxLazy";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { chapters, rooms, site } from "@/lib/content";
@@ -121,7 +121,11 @@ function RoomCard({
                   alt={image.alt}
                   label={room.name}
                   className="aspect-[4/3] w-full"
-                  sizes="(max-width: 768px) 100vw, 560px"
+                  // Mobilde kart, container iç boşluğu (px-5/px-8) nedeniyle
+                  // ekranın tamamını değil ~%92'sini kaplar; "100vw" gereğinden
+                  // büyük kaynak seçtiriyordu (PSI: render 372px, servis 750px).
+                  // Masaüstünde 2 sütun → ~528px, "560px" onu güvenle karşılar.
+                  sizes="(max-width: 767px) 92vw, 560px"
                   loading={photoIndex === 0 ? "eager" : "lazy"}
                 />
                 {/* Fotoğrafın HERHANGİ bir yerine basmak Lightbox'ı doğrudan

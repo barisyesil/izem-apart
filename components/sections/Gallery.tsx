@@ -7,7 +7,7 @@ import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-moti
 import { ZoomIn } from "lucide-react";
 import Container from "@/components/ui/Container";
 import Figure from "@/components/ui/Figure";
-import Lightbox from "@/components/ui/Lightbox";
+import Lightbox from "@/components/ui/LightboxLazy";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { chapters, gallery } from "@/lib/content";
@@ -147,10 +147,12 @@ export default function Gallery() {
 // hisle ÇAKIŞMASIN diye büyüme (scale) efekti de AYNI Framer Motion
 // nesnesinde yönetilir — CSS "hover:scale" ile karışırsa ikisi birbirini
 // bozar, bu yüzden burada sadece tek bir hareket mekanizması kullanılır.
-// Figure'a loading="eager" veriyoruz: şerit gerçek scroll değil, Embla
-// transform ile kaydırıyor; tarayıcının "görünürlüğe yakın" tembel-
-// yükleme sezgisi kareleri geç tetikleyebilirdi. Fotoğraflar optimize
-// WebP olduğu için hepsini baştan yüklemenin maliyeti düşük.
+// Figure varsayılan olarak lazy yükler. Şerit ekranın epey ALTINDA
+// başladığı için, tüm kareleri (~15 adet) açılışta eager indirmek
+// hero'nun kritik yükleme penceresinde bant genişliği yiyor ve LCP'yi
+// geciktiriyordu. Lazy'de tarayıcı, kullanıcı şeride yaklaşınca zaten
+// önceden yüklemeye başlar; her karede bulanık ön izleme (blur ghost,
+// Figure + image-manifest) olduğu için kare asla bomboş görünmez.
 function GalleryPhoto({
   image,
   onOpen,
@@ -202,8 +204,7 @@ function GalleryPhoto({
         alt={image.alt}
         label="Foto"
         className="aspect-[4/5] w-full"
-        sizes="260px"
-        loading="eager"
+        sizes="(max-width: 639px) 210px, 260px"
       />
       <span className="absolute inset-0 flex items-center justify-center bg-ink/0 opacity-0 transition-all duration-300 group-hover:bg-ink/25 group-hover:opacity-100">
         <ZoomIn className="h-7 w-7 text-cream drop-shadow" aria-hidden="true" />
