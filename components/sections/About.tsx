@@ -59,7 +59,7 @@ export default function About() {
                 // "45vw" geniş ekranlarda bunu aşıp gereksiz büyük kaynak
                 // seçtiriyordu. Sabit 512px daha isabetli. Altında tek sütun,
                 // konteyner iç boşluğu düşülünce ~%90vw.
-                sizes="(min-width: 1024px) 512px, 90vw"
+                sizes="(min-width: 1024px) 512px, (max-width: 767px) 75vw, 80vw"
                 // ÖNEMLİ — bu görsel görünüşte "ikinci bölüm, kaydırınca
                 // gelir" olsa da, app/page.tsx'teki "garaj kapısı" hilesi
                 // (-mt-[100dvh] + sticky) bu bölümü Hero'nun TAM ARKASINDA,
