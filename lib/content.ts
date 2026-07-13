@@ -313,6 +313,7 @@ export const contact = {
     messageLabel: "Mesajınız",
     messagePlaceholder: "İletmek istedikleriniz...",
     nameRequiredError: "Lütfen ad soyad alanını doldurun.",
+    messageRequiredError: "Lütfen mesaj alanını doldurun.",
     submitWhatsapp: "WhatsApp ile Gönder",
     submitEmail: "E-posta ile Gönder",
     // Butona basılınca kısa süreliğine görünen onay metinleri.

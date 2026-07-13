@@ -106,7 +106,7 @@ function RoomCard({
   const askThisRoom = () => {
     requestContactPrefill({
       roomType: room.name,
-      message: `Merhaba, ${room.capacity} oda hakkında bilgi alabilir miyim?`,
+      message: `Merhaba, ${room.name} hakkında bilgi alabilir miyim?`,
     });
     // scrollIntoView, globals.css'teki scroll-padding-top'u (header payı)
     // ve "hareketi azalt" tercihini (scroll-behavior: auto) otomatik

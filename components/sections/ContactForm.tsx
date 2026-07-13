@@ -31,11 +31,13 @@ export default function ContactForm() {
   const [message, setMessage] = useState("");
   // Az önce hangi buton kullanıldı? Kısa bir onay göstermek için (2sn).
   const [justSent, setJustSent] = useState<"whatsapp" | "email" | null>(null);
-  // Ad Soyad boş gönderilmeye çalışıldı mı? (bkz. validate())
+  // Zorunlu alanlar boş gönderilmeye çalışıldı mı? (bkz. validate())
   const [nameError, setNameError] = useState(false);
+  const [messageError, setMessageError] = useState(false);
   // "Bu Odayı Sor"dan az önce dolduruldu mu? Kısa bir vurgu halkası için.
   const [justPrefilled, setJustPrefilled] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
 
   // Odalar bölümündeki "Bu Odayı Sor" butonu bir CustomEvent yayınlar
   // (bkz. lib/contactPrefill.ts); burada dinleyip oda tipi + hazır mesajı
@@ -52,16 +54,21 @@ export default function ContactForm() {
     });
   }, [f.roomTypeOptions]);
 
-  // Zorunlu alanları kontrol eder. ÖNEMLİ: bu kontrol React state'ine
-  // (name) bakar, DOM'daki "required" özniteliğine DEĞİL — bu yüzden
-  // birileri tarayıcı geliştirici araçlarından "required"ı silse bile
-  // (backend olmadığı için tek savunma hattımız bu) boş form yine de
-  // gönderilemez. Geçersizse alanı odaklayıp hata mesajını gösterir.
+  // Zorunlu alanları (Ad Soyad + Mesaj) kontrol eder. ÖNEMLİ: bu kontrol
+  // React state'ine bakar, DOM'daki "required" özniteliğine DEĞİL — bu
+  // yüzden birileri tarayıcı geliştirici araçlarından "required"ı silse
+  // bile (backend olmadığı için tek savunma hattımız bu) boş form yine de
+  // gönderilemez. Geçersizse ilk boş alanı odaklayıp hata mesajlarını
+  // gösterir.
   const validate = () => {
-    const isValid = name.trim().length > 0;
-    setNameError(!isValid);
-    if (!isValid) nameInputRef.current?.focus();
-    return isValid;
+    const nameOk = name.trim().length > 0;
+    const messageOk = message.trim().length > 0;
+    setNameError(!nameOk);
+    setMessageError(!messageOk);
+    // İlk geçersiz alana odaklan (önce Ad Soyad, sonra Mesaj).
+    if (!nameOk) nameInputRef.current?.focus();
+    else if (!messageOk) messageInputRef.current?.focus();
+    return nameOk && messageOk;
   };
 
   const messageTitle = "İzem Bayan Apart — İletişim talebi";
@@ -215,22 +222,39 @@ export default function ContactForm() {
         <div>
           <label htmlFor="cf-message" className={labelClass}>
             {f.messageLabel}
+            {/* Zorunlu alan işareti — asıl zorunluluk "required" + validate(). */}
+            <span className="text-terracotta-deep" aria-hidden="true">
+              {" "}
+              *
+            </span>
           </label>
           <textarea
+            ref={messageInputRef}
             id="cf-message"
             rows={4}
+            required
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => {
+              setMessage(e.target.value);
+              if (messageError && e.target.value.trim()) setMessageError(false);
+            }}
             placeholder={f.messagePlaceholder}
-            className={`${fieldClass} resize-y`}
+            aria-invalid={messageError}
+            aria-describedby={messageError ? "cf-message-error" : undefined}
+            className={`${fieldClass} resize-y ${messageError ? "border-red-400 focus:border-red-400 focus:ring-red-200" : ""}`}
           />
+          {messageError && (
+            <p id="cf-message-error" role="alert" className="mt-1.5 text-xs text-red-600">
+              {f.messageRequiredError}
+            </p>
+          )}
         </div>
       </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <button
           type="submit"
-          className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-espresso"
+          className="inline-flex min-h-[48px] flex-1 cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-espresso"
         >
           <SubmitButtonContent
             active={justSent === "whatsapp"}
