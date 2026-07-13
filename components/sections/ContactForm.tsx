@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Check, Mail } from "lucide-react";
+import { Check, CheckCheck, Mail } from "lucide-react";
 import { WhatsappIcon } from "@/components/ui/brand-icons";
 import { contact, site } from "@/lib/content";
 import { onContactPrefill } from "@/lib/contactPrefill";
@@ -64,24 +64,30 @@ export default function ContactForm() {
     return isValid;
   };
 
-  // Form alanlarını okunaklı bir mesaja dönüştür. YALNIZCA kullanıcının
-  // gerçekten verdiği bilgiler eklenir — boş bir alan için "Telefon:" gibi
-  // içi boş bir satır ASLA oluşmaz. Ad Soyad zorunlu olduğundan (validate)
-  // her zaman vardır. Oda Tipi, varsayılan/nötr seçim ("Fark etmez",
-  // roomTypeOptions[0]) dışında bir değerse eklenir — böylece kullanıcı
-  // özellikle bir oda seçmediyse gereksiz gürültü olmaz.
+  const messageTitle = "İzem Bayan Apart — İletişim talebi";
+
+  // Mesaj, YALNIZCA kullanıcının gerçekten verdiği alanlardan kurulur —
+  // boş bir alan için "Telefon:" gibi içi boş bir satır ASLA oluşmaz.
+  // Ad Soyad zorunludur (validate). Oda Tipi, varsayılan/nötr seçim
+  // ("Fark etmez", roomTypeOptions[0]) dışında bir değerse eklenir.
+  // Hem gönderilen metin (buildText) hem canlı sohbet önizlemesi
+  // (MessagePreview) bu TEK listeden beslenir ki ikisi asla ayrışmasın.
+  const messageFields = [
+    { key: "name", label: "Ad Soyad", value: name.trim() },
+    { key: "phone", label: "Telefon", value: phone.trim() },
+    {
+      key: "room",
+      label: "Oda Tipi",
+      value: roomType && roomType !== f.roomTypeOptions[0] ? roomType : "",
+    },
+    { key: "message", label: "Mesaj", value: message.trim() },
+  ].filter((field) => field.value);
+
+  // Form alanlarını okunaklı bir mesaja dönüştür.
   const buildText = () =>
-    [
-      "İzem Bayan Apart — İletişim talebi",
-      `Ad Soyad: ${name.trim()}`,
-      phone.trim() ? `Telefon: ${phone.trim()}` : "",
-      roomType && roomType !== f.roomTypeOptions[0]
-        ? `Oda Tipi: ${roomType}`
-        : "",
-      message.trim() ? `Mesaj: ${message.trim()}` : "",
-    ]
-      .filter(Boolean)
-      .join("\n");
+    [messageTitle, ...messageFields.map((fld) => `${fld.label}: ${fld.value}`)].join(
+      "\n",
+    );
 
   const confirmBriefly = (via: "whatsapp" | "email") => {
     setJustSent(via);
@@ -124,6 +130,7 @@ export default function ContactForm() {
   const labelClass = "mb-1.5 block text-sm font-medium text-ink";
 
   return (
+    <div className="space-y-4">
     <form
       onSubmit={sendWhatsapp}
       className={`rounded-2xl border bg-cream p-6 ring-0 transition-[box-shadow,border-color] duration-500 sm:p-8 ${
@@ -248,6 +255,12 @@ export default function ContactForm() {
 
       <p className="mt-4 text-xs leading-relaxed text-taupe">{f.note}</p>
     </form>
+
+      {/* Canlı sohbet önizlemesi — kullanıcı formu doldurdukça WhatsApp/
+          e-posta ile gidecek mesaj, tatlı bir sohbet balonunda anlık
+          belirir. Formla AYNI messageFields listesinden beslenir. */}
+      <MessagePreview title={messageTitle} fields={messageFields} />
+    </div>
   );
 }
 
@@ -294,5 +307,118 @@ function SubmitButtonContent({
         </motion.span>
       )}
     </AnimatePresence>
+  );
+}
+
+// =====================================================================
+// CANLI SOHBET ÖNİZLEMESİ
+// ---------------------------------------------------------------------
+// Formla AYNI messageFields listesinden beslenir. Kullanıcı yazdıkça,
+// gönderilecek mesaj bir WhatsApp-vari sohbet balonunda anlık belirir;
+// her satır tek tek içeri süzülür, balon yumuşakça büyür/küçülür. Alan
+// boşken zarif bir "yazıyor" noktalı göstergesi + davet metni görünür.
+// "Hareketi azalt" açıksa tüm animasyonlar kapanır, içerik yine doğru.
+// =====================================================================
+type PreviewField = { key: string; label: string; value: string };
+
+function MessagePreview({
+  title,
+  fields,
+}: {
+  title: string;
+  fields: PreviewField[];
+}) {
+  const reduceMotion = useReducedMotion();
+  const hasContent = fields.length > 0;
+  const bubbleSpring = reduceMotion
+    ? { duration: 0 }
+    : { type: "spring" as const, stiffness: 480, damping: 34 };
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-hairline bg-warmwhite">
+      {/* Sohbet başlığı */}
+      <div className="flex items-center gap-3 border-b border-hairline bg-cream/70 px-4 py-3">
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sage/15 text-sage-deep">
+          <WhatsappIcon className="h-5 w-5" aria-hidden="true" />
+        </span>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium text-ink">İzem Bayan Apart</p>
+          <p className="flex items-center gap-1.5 text-[11px] text-taupe">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-sage-deep" />
+            mesaj önizlemesi
+          </p>
+        </div>
+      </div>
+
+      {/* Sohbet gövdesi — giden (sağa yaslı) balon */}
+      <div className="px-4 py-4">
+        <div className="flex justify-end">
+          <motion.div
+            layout={!reduceMotion}
+            transition={bubbleSpring}
+            className="max-w-[88%] rounded-2xl rounded-br-md bg-sage/15 px-3.5 py-2.5 shadow-sm ring-1 ring-sage/15"
+          >
+            {hasContent ? (
+              <motion.div layout={!reduceMotion} className="space-y-1">
+                <motion.p
+                  layout={!reduceMotion}
+                  className="text-[11px] font-semibold uppercase tracking-wide text-sage-deep"
+                >
+                  {title}
+                </motion.p>
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {fields.map((field) => (
+                    <motion.p
+                      key={field.key}
+                      layout={!reduceMotion}
+                      initial={reduceMotion ? false : { opacity: 0, y: 6, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={reduceMotion ? undefined : { opacity: 0, y: -4, scale: 0.98 }}
+                      transition={
+                        reduceMotion ? { duration: 0 } : { duration: 0.28, ease: [0.22, 1, 0.36, 1] }
+                      }
+                      className="whitespace-pre-wrap break-words text-sm leading-snug text-ink"
+                    >
+                      <span className="text-taupe">{field.label}:</span> {field.value}
+                    </motion.p>
+                  ))}
+                </AnimatePresence>
+                <div className="flex items-center justify-end gap-1 pt-0.5 text-[10px] text-taupe">
+                  şimdi
+                  <CheckCheck className="h-3 w-3 text-sage-deep" aria-hidden="true" />
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                layout={!reduceMotion}
+                className="flex items-center gap-1 py-1"
+                aria-label="Mesaj bekleniyor"
+              >
+                {[0, 1, 2].map((i) => (
+                  <motion.span
+                    key={i}
+                    className="block h-1.5 w-1.5 rounded-full bg-taupe/60"
+                    animate={
+                      reduceMotion ? undefined : { y: [0, -3, 0], opacity: [0.4, 1, 0.4] }
+                    }
+                    transition={
+                      reduceMotion
+                        ? undefined
+                        : { duration: 0.9, repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }
+                    }
+                  />
+                ))}
+              </motion.div>
+            )}
+          </motion.div>
+        </div>
+
+        {!hasContent && (
+          <p className="mt-2.5 text-center text-xs text-taupe">
+            Formu doldurdukça mesajınız burada belirir.
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
