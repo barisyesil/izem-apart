@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Check, CheckCheck, Mail } from "lucide-react";
+import { Check, CheckCheck, ChevronDown, Mail, MessageCircle } from "lucide-react";
 import { WhatsappIcon } from "@/components/ui/brand-icons";
 import { contact, site } from "@/lib/content";
 import { onContactPrefill } from "@/lib/contactPrefill";
@@ -24,6 +24,7 @@ import type { IconType } from "@/lib/types";
 // =====================================================================
 export default function ContactForm() {
   const f = contact.form;
+  const reducePreviewMotion = useReducedMotion();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -36,6 +37,9 @@ export default function ContactForm() {
   const [messageError, setMessageError] = useState(false);
   // "Bu Odayı Sor"dan az önce dolduruldu mu? Kısa bir vurgu halkası için.
   const [justPrefilled, setJustPrefilled] = useState(false);
+  // Canlı mesaj önizlemesi varsayılan olarak GİZLİ; kullanıcı bir butonla
+  // açar (tatlı bir animasyonla süzülerek gelir).
+  const [showPreview, setShowPreview] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -280,10 +284,53 @@ export default function ContactForm() {
       <p className="mt-4 text-xs leading-relaxed text-taupe">{f.note}</p>
     </form>
 
-      {/* Canlı sohbet önizlemesi — kullanıcı formu doldurdukça WhatsApp/
-          e-posta ile gidecek mesaj, tatlı bir sohbet balonunda anlık
-          belirir. Formla AYNI messageFields listesinden beslenir. */}
-      <MessagePreview title={messageTitle} fields={messageFields} />
+      {/* Canlı sohbet önizlemesi — VARSAYILAN GİZLİ. Aşağıdaki butonla
+          açılır; formla AYNI messageFields listesinden beslenir, açıkken
+          kullanıcı yazdıkça anlık güncellenir. */}
+      <div>
+        <button
+          type="button"
+          onClick={() => setShowPreview((v) => !v)}
+          aria-expanded={showPreview}
+          aria-controls="cf-preview"
+          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-hairline bg-warmwhite px-4 py-2 text-sm font-medium text-ink transition-colors hover:border-sage hover:text-sage-deep"
+        >
+          <MessageCircle className="h-4 w-4" aria-hidden="true" />
+          {showPreview ? "Önizlemeyi gizle" : "Mesaj önizlemeyi göster"}
+          <ChevronDown
+            className={`h-4 w-4 transition-transform duration-300 ${showPreview ? "rotate-180" : ""}`}
+            aria-hidden="true"
+          />
+        </button>
+
+        <AnimatePresence initial={false}>
+          {showPreview && (
+            <motion.div
+              key="preview"
+              id="cf-preview"
+              initial={reducePreviewMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+              animate={reducePreviewMotion ? { opacity: 1 } : { height: "auto", opacity: 1 }}
+              exit={reducePreviewMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+              transition={{ duration: reducePreviewMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="overflow-hidden"
+            >
+              <motion.div
+                initial={reducePreviewMotion ? false : { scale: 0.96, y: 8 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={reducePreviewMotion ? undefined : { scale: 0.96, y: 8 }}
+                transition={
+                  reducePreviewMotion
+                    ? { duration: 0 }
+                    : { type: "spring", stiffness: 380, damping: 30 }
+                }
+                className="pt-3"
+              >
+                <MessagePreview title={messageTitle} fields={messageFields} />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
