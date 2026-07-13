@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, Mail } from "lucide-react";
 import { WhatsappIcon } from "@/components/ui/brand-icons";
 import { contact, site } from "@/lib/content";
+import { onContactPrefill } from "@/lib/contactPrefill";
 import type { IconType } from "@/lib/types";
 
 // =====================================================================
@@ -32,7 +33,24 @@ export default function ContactForm() {
   const [justSent, setJustSent] = useState<"whatsapp" | "email" | null>(null);
   // Ad Soyad boş gönderilmeye çalışıldı mı? (bkz. validate())
   const [nameError, setNameError] = useState(false);
+  // "Bu Odayı Sor"dan az önce dolduruldu mu? Kısa bir vurgu halkası için.
+  const [justPrefilled, setJustPrefilled] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
+
+  // Odalar bölümündeki "Bu Odayı Sor" butonu bir CustomEvent yayınlar
+  // (bkz. lib/contactPrefill.ts); burada dinleyip oda tipi + hazır mesajı
+  // doldururuz. Kaydırmayı Rooms tarafı yapar; biz sadece state'i kurup
+  // kısa bir vurgu halkası yakarız ki kullanıcı formun dolduğunu fark etsin.
+  useEffect(() => {
+    return onContactPrefill((detail) => {
+      if (detail.roomType && f.roomTypeOptions.includes(detail.roomType)) {
+        setRoomType(detail.roomType);
+      }
+      if (detail.message !== undefined) setMessage(detail.message);
+      setJustPrefilled(true);
+      window.setTimeout(() => setJustPrefilled(false), 1800);
+    });
+  }, [f.roomTypeOptions]);
 
   // Zorunlu alanları kontrol eder. ÖNEMLİ: bu kontrol React state'ine
   // (name) bakar, DOM'daki "required" özniteliğine DEĞİL — bu yüzden
@@ -46,14 +64,21 @@ export default function ContactForm() {
     return isValid;
   };
 
-  // Form alanlarını okunaklı bir mesaja dönüştür.
+  // Form alanlarını okunaklı bir mesaja dönüştür. YALNIZCA kullanıcının
+  // gerçekten verdiği bilgiler eklenir — boş bir alan için "Telefon:" gibi
+  // içi boş bir satır ASLA oluşmaz. Ad Soyad zorunlu olduğundan (validate)
+  // her zaman vardır. Oda Tipi, varsayılan/nötr seçim ("Fark etmez",
+  // roomTypeOptions[0]) dışında bir değerse eklenir — böylece kullanıcı
+  // özellikle bir oda seçmediyse gereksiz gürültü olmaz.
   const buildText = () =>
     [
       "İzem Bayan Apart — İletişim talebi",
-      `Ad Soyad: ${name}`,
-      `Telefon: ${phone}`,
-      `Oda Tipi: ${roomType}`,
-      message ? `Mesaj: ${message}` : "",
+      `Ad Soyad: ${name.trim()}`,
+      phone.trim() ? `Telefon: ${phone.trim()}` : "",
+      roomType && roomType !== f.roomTypeOptions[0]
+        ? `Oda Tipi: ${roomType}`
+        : "",
+      message.trim() ? `Mesaj: ${message.trim()}` : "",
     ]
       .filter(Boolean)
       .join("\n");
@@ -101,7 +126,9 @@ export default function ContactForm() {
   return (
     <form
       onSubmit={sendWhatsapp}
-      className="rounded-2xl border border-hairline bg-cream p-6 sm:p-8"
+      className={`rounded-2xl border bg-cream p-6 ring-0 transition-[box-shadow,border-color] duration-500 sm:p-8 ${
+        justPrefilled ? "border-sage ring-2 ring-sage/50" : "border-hairline"
+      }`}
     >
       <div className="space-y-5">
         <div>
@@ -147,7 +174,14 @@ export default function ContactForm() {
             autoComplete="tel"
             inputMode="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            // Telefon alanına alakasız karakter girilemesin: rakam, boşluk
+            // ve + - ( ) dışındaki her şeyi anında ayıklıyoruz. onChange
+            // üzerinde filtrelemek, keydown'ı engellemekten daha sağlamdır —
+            // yapıştırmayı (paste), mobil klavyeyi ve otomatik doldurmayı da
+            // aynı anda kapsar (izinsiz karakter hiç görünmez).
+            onChange={(e) =>
+              setPhone(e.target.value.replace(/[^0-9\s()+-]/g, ""))
+            }
             placeholder={f.phonePlaceholder}
             className={fieldClass}
           />

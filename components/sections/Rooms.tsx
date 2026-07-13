@@ -9,7 +9,8 @@ import Figure from "@/components/ui/Figure";
 import Lightbox from "@/components/ui/LightboxLazy";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { chapters, rooms, site } from "@/lib/content";
+import { chapters, rooms } from "@/lib/content";
+import { requestContactPrefill } from "@/lib/contactPrefill";
 import type { Room } from "@/lib/types";
 
 // =====================================================================
@@ -98,9 +99,20 @@ function RoomCard({
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
-  const whatsappHref = `${site.whatsappHref}?text=${encodeURIComponent(
-    `Merhaba, ${room.name} hakkında bilgi almak istiyorum.`,
-  )}`;
+  // "Bu Odayı Sor": artık WhatsApp'a doğrudan gitmiyor. Bunun yerine
+  // iletişim formunu bu odaya göre önceden doldurup (oda tipi + hazır
+  // mesaj) forma yumuşakça kaydırıyor. Kullanıcı mesajı gözden geçirip
+  // WhatsApp'la mı e-postayla mı göndereceğine formda karar veriyor.
+  const askThisRoom = () => {
+    requestContactPrefill({
+      roomType: room.name,
+      message: `Merhaba, ${room.capacity} oda hakkında bilgi alabilir miyim?`,
+    });
+    // scrollIntoView, globals.css'teki scroll-padding-top'u (header payı)
+    // ve "hareketi azalt" tercihini (scroll-behavior: auto) otomatik
+    // gözetir — bu yüzden behavior'ı ELLE "smooth" vermiyoruz.
+    document.getElementById("iletisim")?.scrollIntoView();
+  };
 
   return (
     <motion.article
@@ -238,14 +250,13 @@ function RoomCard({
           >
             Fotoğrafları Gör ({room.gallery.length})
           </button>
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-hairline px-6 text-sm text-ink transition-colors hover:bg-sand/60"
+          <button
+            type="button"
+            onClick={askThisRoom}
+            className="inline-flex min-h-[48px] cursor-pointer items-center justify-center gap-2 rounded-full border border-hairline px-6 text-sm text-ink transition-colors hover:bg-sand/60"
           >
             Bu Odayı Sor
-          </a>
+          </button>
         </div>
       </div>
     </motion.article>
