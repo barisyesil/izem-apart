@@ -288,6 +288,7 @@ export default function ContactForm() {
           açılır; formla AYNI messageFields listesinden beslenir, açıkken
           kullanıcı yazdıkça anlık güncellenir. */}
       <div>
+        <div className="flex justify-center">
         <button
           type="button"
           onClick={() => setShowPreview((v) => !v)}
@@ -302,6 +303,7 @@ export default function ContactForm() {
             aria-hidden="true"
           />
         </button>
+        </div>
 
         <AnimatePresence initial={false}>
           {showPreview && (
