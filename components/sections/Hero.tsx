@@ -33,6 +33,7 @@ export default function Hero() {
             // bunu açıkça de belirtiyoruz.
             fetchPriority="high"
             sizes="100vw"
+            quality={60}
             className="animate-hero-pan object-cover object-[30%_38%]"
             {...(imageMeta[hero.image]
               ? {
